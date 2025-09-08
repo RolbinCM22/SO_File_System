@@ -2,7 +2,7 @@
 Conteste las siguientes preguntas:
 ##### - Cuáles serían los metadatos del filesystem? <- Esos serían atributos del file system
 Nombre
-Tamaño Total
+Tamaño total
 Tamaño del bloque 
 Espacio libre 
 Tipo
@@ -16,7 +16,6 @@ Nombre
 Tamaño
 Ubicación
 Permisos de acceso 
-Ubicación
 Fecha de creación
 Estado (Abierto, cerrado)
 Tipo de archivo
@@ -49,6 +48,7 @@ Nodos indice (inodes)
 Directorios
 
 Haga un diseño de un sistema de archivos de tipo indexado que incorpore las respuestas a estas preguntas junto con la especificación del funcamiento, las operaciones primordiales sobre archivos, los metadatos de archivos, los componentes principales, la interacción entre ellos, la especificación de lo qué son y lo que hacen y la definición de lo mínimo requerido para la implementación.
+![alt text](SystemFile.jpg)
 Programe el sistema de archivos los componentes principales, la interacción entre ellos, la especificación de lo qué son y lo que hacen y la definición de lo mínimo requerido para la implementación, en un repositorio de REPL.IT, compartido con el docente, para almacenar datos de dibujos ascii según las especificaciones del proyecto de PI.
 
 Por ej, 
