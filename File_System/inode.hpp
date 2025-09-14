@@ -5,6 +5,10 @@
 
 struct inode
 {
+    std::string name; 
+    std::string type;
+    std::string state;
+    uint64_t length;
     uint64_t inodeId;
     std::string fileType;
     uint64_t fileSize;

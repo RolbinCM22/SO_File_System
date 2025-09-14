@@ -6,10 +6,6 @@
 
 class file {
     private:
-        std::string name; 
-        std::string type;
-        std::string state;
-        uint64_t length;
         inode metadata;
     public:
         file();
