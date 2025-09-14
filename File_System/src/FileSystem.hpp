@@ -3,6 +3,7 @@
 #include <vector>
 #include <ctime>
 #include "inode.hpp"
+#include "directory.hpp"
 
 class FileSystem {
     private:
@@ -14,7 +15,8 @@ class FileSystem {
         std::string identified;
         std::string type;
         std::vector<bool> bitMap;
-        std::vector<inode> files; 
+        std::vector<inode> files;
+        directory directory; 
     public:
         FileSystem()
         ~FileSystem();
