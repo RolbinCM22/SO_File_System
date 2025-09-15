@@ -1,3 +1,5 @@
+#ifndef FILESYSTEM_HPP
+#define FILESYSTEM_HPP
 #include <iostream>
 #include <string>
 #include <vector>
@@ -16,9 +18,10 @@ class FileSystem {
         std::string type;
         std::vector<bool> bitMap;
         std::vector<inode> files;
-        directory directory; 
+        //directory direc; 
+        int initializeDisk(); // <-- Función para inicializar el disco
     public:
-        FileSystem()
+        FileSystem();
         ~FileSystem();
         void createFile(const std::string& filename, uint64_t size);
         std::string openFile(const std::string& filename);
@@ -29,5 +32,5 @@ class FileSystem {
     
 
 
-}
-    
+};
+#endif // FILESYSTEM_HPP
