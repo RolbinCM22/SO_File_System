@@ -1,3 +1,5 @@
+#ifndef INODE_HPP
+#define INODE_HPP
 #include <iostream>
 #include <string>
 #include <vector>
@@ -17,3 +19,4 @@ struct inode
     std::vector<uint64_t> BlockPointers;
     std::string permissions;
 };
+#endif // INODE_HPP

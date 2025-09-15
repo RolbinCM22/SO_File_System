@@ -14,7 +14,7 @@ class file {
         std::string getType() const;
         std::string getState() const;
         uint64_t getLength() const;
-        iNode getMetadata() const;
+        inode getMetadata() const;
         void open();
         void close();
 };
