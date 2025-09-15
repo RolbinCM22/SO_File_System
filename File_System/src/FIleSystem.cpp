@@ -37,13 +37,14 @@ int FileSystem::initializeDisk(){
 
 
 
-int createFile(const std::string& filename, uint64_t size){
+/*int createFile(const std::string& filename, uint64_t size){
     
     
-    return 0;
-  }
- std::string openFile(const std::string& filename);
-    void writeFile(std::string identified, std::string& data);
-    void readFile(uint64_t* location);
-    void deleteFile(const std::string& filename);
-    void searchFile(const std::string& filename);   
+  return 0;
+}*/
+ 
+  std::string openFile(const std::string& filename);
+  void writeFile(std::string identified, std::string& data);
+  void readFile(uint64_t* location);
+  void deleteFile(const std::string& filename);
+  void searchFile(const std::string& filename);   

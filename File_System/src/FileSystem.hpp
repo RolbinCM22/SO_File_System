@@ -6,7 +6,7 @@
 #include <cstdint>
 #include <ctime>
 #include "iNode.hpp"
-#include "directory.hpp"
+#include "Directory.hpp"
 
 class FileSystem {
     private:
@@ -18,7 +18,7 @@ class FileSystem {
         std::string identified;
         std::string type;
         std::vector<bool> bitMap;
-        std::vector<inode> files;
+        std::vector<iNode> files;
         //directory direc; 
         int initializeDisk(); // <-- Función para inicializar el disco
     public:
