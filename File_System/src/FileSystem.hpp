@@ -1,10 +1,11 @@
-#ifndef FILESYSTEM_HPP
-#define FILESYSTEM_HPP
+#pragma once
+
 #include <iostream>
 #include <string>
 #include <vector>
+#include <cstdint>
 #include <ctime>
-#include "inode.hpp"
+#include "iNode.hpp"
 #include "directory.hpp"
 
 class FileSystem {
@@ -33,4 +34,4 @@ class FileSystem {
 
 
 };
-#endif // FILESYSTEM_HPP
+

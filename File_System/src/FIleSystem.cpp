@@ -1,8 +1,5 @@
-#ifndef FILESYSTEM_H
-#define FILESYSTEM_H
 #include <fstream>
 #include "FileSystem.hpp"
-
 
 FileSystem::FileSystem(){
   this->name = "MyFileSystem";
@@ -38,16 +35,15 @@ int FileSystem::initializeDisk(){
   return 0;
 }
 
-  int createFile(const std::string& filename, uint64_t size){
+
+
+int createFile(const std::string& filename, uint64_t size){
     
     
     return 0;
   }
-    std::string openFile(const std::string& filename);
+ std::string openFile(const std::string& filename);
     void writeFile(std::string identified, std::string& data);
     void readFile(uint64_t* location);
     void deleteFile(const std::string& filename);
-    void searchFile(const std::string& filename);
-
-
-#endif 
+    void searchFile(const std::string& filename);   
