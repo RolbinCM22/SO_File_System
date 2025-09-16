@@ -11,11 +11,10 @@
 class FileSystem {
   private:
     std::string name; 
-    uint64_t total_size;
+    uint64_t size;
     uint64_t free_size;
     uint64_t block_size;
     uint64_t blocks;
-    uint16_t magicNumber;
     std::string identified;
     std::string type;
     std::vector<bool> bitMap;
