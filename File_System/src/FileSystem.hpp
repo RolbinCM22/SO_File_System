@@ -20,8 +20,9 @@ class FileSystem {
     std::vector<bool> bitMap;
     std::vector<iNode> files;
     //directory direc; 
-    int initializeDisk(); // <-- Función para inicializar el disco
+    int initializeDirectory(); // <-- Función para inicializar el directorio
     int loadBitMap();
+    int saveDirectory();
 public:
     FileSystem();
     ~FileSystem();
