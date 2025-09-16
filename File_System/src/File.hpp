@@ -14,6 +14,7 @@ class File {
  private:
   /** @brief Metadata structure containing file attributes (iNode). */
   iNode metadata;
+  std::string content;
  public:
   /** @brief Constructs a new File object with default metadata. */
   File();

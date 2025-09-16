@@ -3,15 +3,12 @@
 
 int main() {
 
-    // Declaration of Variable
-  int num1 = 24;
-  int num2 = 34;
+    FileSystem fs = FileSystem();
+    
+    
 
-  int result = num1 + num2;
-  std::cout << result << std::endl;
-
-  // Return Statement
-  return 0;
+    // Return Statement
+    return 0;
 }
 
 
