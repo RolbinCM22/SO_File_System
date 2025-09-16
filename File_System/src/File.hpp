@@ -6,6 +6,7 @@
 class File {
  private:
   iNode metadata;
+  std::string content;
  public:
   File();
   ~File();
