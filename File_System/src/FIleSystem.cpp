@@ -60,6 +60,8 @@ int FileSystem::saveDirectory() {
   if (!disk) {
       std::cerr << "Error initializing the disk" << std::endl;
   }
+  // Guardar la estructura de directorio en el disco
+  disk.close();
   return -1;
 }
 
@@ -109,7 +111,7 @@ void FileSystem::createFile(const std::string& filename, uint64_t size) {
     std::cerr << "No hay bloques libres disponibles." << std::endl;
     return;
   }
-  bitmap[contador] = true;
+  
   disk.seekp(block_size * contador, std::ios::beg);
   disk.write(reinterpret_cast<const char*>(&newFile), sizeof(newFile));
   disk.close();
@@ -137,8 +139,35 @@ int FileSystem::closeFile(const std::string& filename) {
   return -1;
 }
 
-void FileSystem::writeFile(std::string identified, std::string& data) {
+int FileSystem::writeFile(const std::string& filename, std::string& data) {
+  for(auto& file : files) {
+    if(file.name == filename){
+      if(file.state != "open") {
+        std::cerr << "El archivo no está abierto." << std::endl;
+        return -1;
+      }
+      file.content = data;
+      file.metadata.length = file.content.size() + calculateNodeSize(file.metadata);
+      uint64_t blockneeded = (file.metadata.length + block_size - 1) / block_size;
+      if(blockneeded > this-> free_size / block_size) {
+        std::cerr << "No hay espacio suficiente en el sistema de archivos." << std::endl;
+        return -1;
+      }
+      int64_t contador = 4; // Empezar a buscar desde el bloque 4
 
+      while(blockneeded > 0) {
+        if(contador >= blocks) {
+          std::cerr << "No hay bloques libres disponibles." << std::endl;
+          return;
+        }
+        if(!bitMap[contador]) {
+          bitMap[contador] = true;
+          file.metadata.BlockPointers.push_back(contador);
+          blockneeded--;
+        }
+        contador++;
+      }
+    }
 }
 
 void FileSystem::readFile(uint64_t* location) {
@@ -146,3 +175,23 @@ void FileSystem::readFile(uint64_t* location) {
 }
   void deleteFile(const std::string& filename);
   void searchFile(const std::string& filename);
+
+size_t calculateNodeSize(const iNode& node) {
+    size_t total = 0;
+
+    // Campos fijos
+    total += sizeof(node.inodeId);
+    total += sizeof(node.length);
+    total += sizeof(node.modificationTime);
+
+    // Strings: suma el tamaño del string + tamaño para guardar la longitud
+    total += sizeof(uint64_t) + node.name.size();
+    total += sizeof(uint64_t) + node.type.size();
+    total += sizeof(uint64_t) + node.state.size();
+
+    // Vector de bloques: tamaño para la cantidad + los bloques
+    total += sizeof(uint64_t); // cantidad de bloques
+    total += node.BlockPointers.size() * sizeof(uint64_t);
+
+    return total;
+}
