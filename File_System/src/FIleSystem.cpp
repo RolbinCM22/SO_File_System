@@ -115,8 +115,26 @@ void FileSystem::createFile(const std::string& filename, uint64_t size) {
   disk.close();
 }
 
-std::string FileSystem::openFile(const std::string& filename) {
+int FileSystem::openFile(const std::string& filename) {
+  for(auto& file : files) {
+    if(file.name == filename) {
+      file.state = "open";
+      return 0;
+    }
+  }
+  std::cerr << "El archivo no existe." << std::endl;
+  return -1;
+}
 
+int FileSystem::closeFile(const std::string& filename) {
+  for(auto& file : files) {
+    if(file.name == filename) {
+      file.state = "closed";
+      return 0;
+    }
+  }
+  std::cerr << "El archivo no existe." << std::endl;
+  return -1;
 }
 
 void FileSystem::writeFile(std::string identified, std::string& data) {

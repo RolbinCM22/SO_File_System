@@ -27,7 +27,8 @@ public:
     FileSystem();
     ~FileSystem();
     void createFile(const std::string& filename, uint64_t size);
-    std::string openFile(const std::string& filename);
+    int openFile(const std::string& filename);
+    int closeFile(const std::string& filename);
     void writeFile(std::string identified, std::string& data);
     void readFile(uint64_t* location);
     void deleteFile(const std::string& filename);
