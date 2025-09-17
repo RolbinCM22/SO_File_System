@@ -42,7 +42,7 @@ public:
      * @param filename Nombre del archivo a agregar.
      * @return true si se agregó correctamente, false si el nombre ya existe.
      */
-    bool addToDirectory(const std::string& filename);
+    bool addToDirectory(const std::string& filename, uint64_t inodeNumber);
     /**
      * @brief Elimina un archivo del directorio.
      * @param filename Nombre del archivo a eliminar.
