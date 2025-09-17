@@ -418,3 +418,5 @@ FodyWeavers.xsd
 *.msp
 .idea/
 cmake-build-*/
+*.o
+*.d
