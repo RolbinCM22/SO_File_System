@@ -15,48 +15,58 @@ class File {
  private:
   /** @brief Metadata structure containing file attributes (iNode). */
   iNode metadata;
-  std::string content;
+
  public:
+  /** @brief Constructs a new File object with the provided data. */
+  File(uint64_t id, const std::string &fileName, const std::string &permissions, uint64_t block);
+
   /** @brief Constructs a new File object with default metadata. */
   File();
   /** @brief Destroys the File object and releases any related resources. */
   ~File();
 
   /**
+  * @brief Opens the file for operations.
+  */
+  bool open();
+  /**
+  * @brief Closes the file and releases associated resources.
+  */
+  bool close();
+
+  bool truncate();
+
+  bool deleteFile();
+
+  ///> Getters
+ public:
+  /**
    * @brief Retrieves the file name.
    * @return File name as a string.
    */
-  std::string getName() const {return this->metadata.name;}
+  [[nodiscard]] std::string getName() const {return this->metadata.name;}
 
   /**
    * @brief Gets the file type (e.g., directory, regular file, link).
    * @return File type as a string.
    */
-  std::string getType() const {return this->metadata.type;}
+  [[nodiscard]] std::string getType() const {return this->metadata.type;}
 
   /**
-  * @brief Gets the current state of the file.
+  * @brief Gets the currently file state.
   * @return File state as a string.
   */
-  std::string getState() const {}
+  [[nodiscard]] std::string getState() const {return this->metadata.state;}
 
   /**
   * @brief Gets the length of the file in bytes.
   * @return File length.
   */
-  uint64_t getLength() const;
+  [[nodiscard]] uint64_t getLength() const {return this->metadata.length;}
 
   /**
   * @brief Retrieves the underlying iNode metadata.
   * @return iNode structure containing file attributes.
   */
-  inline iNode getMetadata() const {return this->metadata;}
-  /**
-  * @brief Opens the file for operations.
-  */
-  void open();
-  /**
-  * @brief Closes the file and releases associated resources.
-  */
-  void close();
+  [[nodiscard]] iNode getMetadata() const {return this->metadata;}
 };
