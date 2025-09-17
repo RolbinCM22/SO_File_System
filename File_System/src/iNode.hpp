@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <ctime>
+#include <cstdint>
 
 /**
  * @struct iNode
