@@ -45,14 +45,18 @@ bool Directory::removeFromDirectory(const std::string& filename) {
 }
 
 /**
- * @brief Busca un archivo en el directorio por nombre.
+ * @brief Busca un archivo en el directorio por nombre y retorna su número de iNode.
  * @param filename Nombre del archivo a buscar.
- * @return true si se encontró, false en caso contrario.
+ * @return Número de iNode si se encontró, UINT64_MAX en caso contrario.
  */
-bool Directory::findInDirectory(const std::string& filename) {
-    return std::any_of(files.begin(), files.end(), [&](const Entry& e) {
+uint64_t Directory::findInDirectory(const std::string& filename) {
+    auto it = std::find_if(files.begin(), files.end(), [&](const Entry& e) {
         return e.filename == filename;
     });
+    if (it != files.end()) {
+        return it->inodeNumber;
+    }
+    return UINT64_MAX;
 }
 
 /**
@@ -78,5 +82,5 @@ void Directory::printDirectory() {
  * @return true si el nombre está repetido, false en caso contrario.
  */
 bool Directory::repeatName(const std::string& filename) {
-    return findInDirectory(filename);
+    return findInDirectory(filename) != UINT64_MAX;
 }

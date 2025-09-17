@@ -50,11 +50,11 @@ public:
      */
     bool removeFromDirectory(const std::string& filename);
     /**
-     * @brief Busca un archivo en el directorio.
+     * @brief Busca un archivo en el directorio por nombre y retorna su número de iNode.
      * @param filename Nombre del archivo a buscar.
-     * @return true si se encontró, false en caso contrario.
+     * @return Número de iNode si se encontró, UINT64_MAX en caso contrario.
      */
-    bool findInDirectory(const std::string& filename);
+    uint64_t findInDirectory(const std::string& filename);
     /**
      * @brief Lista los archivos contenidos en el directorio.
      */
