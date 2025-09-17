@@ -22,15 +22,13 @@ struct iNode {
   /** File state (e.g. open, closed)*/
   std::string state;
   /** File length in bytes*/
-  uint64_t length;
+ // uint64_t length;
   /** File extension type*/
-  std::string fileType;
-  /** File size in blocks.*/
   uint64_t fileSize;
   /** File creation timestamp*/
-  std::time_t creationTime;
+ // std::time_t creationTime;
   /** File last modification timestamp.*/
-  std::time_t modificationTime;
+ // std::time_t modificationTime;
   /** File related block pointers.*/
   std::vector<uint64_t> BlockPointers;
   /** File declared permissions.*/

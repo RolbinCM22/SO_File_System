@@ -11,12 +11,13 @@ class Directory {
   uint64_t inodeNumber;
  };
  private:
-  std::vector<Entry> files;
+  
 
  public:
+  std::vector<Entry> entries;
   Directory();
   ~Directory();
-  bool addToDirectory(const std::string& filename);
+  bool addToDirectory(const std::string& filename, uint64_t inodeNumber);
   bool removeFromDirectory(const std::string& filename);
   bool findInDirectory(const std::string& filename);
   void listFiles();

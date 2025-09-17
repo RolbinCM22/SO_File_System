@@ -19,14 +19,14 @@ class FileSystem {
     std::string type;
     std::vector<bool> bitMap;
     std::vector<iNode> files;
-    //directory direc; 
+    Directory dir; 
     int initializeDirectory(); // <-- Función para inicializar el directorio
     int loadBitMap();
     int saveDirectory();
 public:
     FileSystem();
     ~FileSystem();
-    void createFile(const std::string& filename, uint64_t size);
+    int createFile(const std::string& filename, std::string permissions);
     int openFile(const std::string& filename);
     int closeFile(const std::string& filename);
     void writeFile(std::string identified, std::string& data);
