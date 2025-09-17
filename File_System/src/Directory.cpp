@@ -21,11 +21,11 @@ Directory::~Directory() {}
  * @param filename Nombre del archivo a agregar.
  * @return true si se agregó correctamente, false si el nombre ya existe.
  */
-bool Directory::addToDirectory(const std::string& filename) {
+bool Directory::addToDirectory(const std::string& filename, uint64_t inodeNumber) {
     if (repeatName(filename)) return false;
     Entry entry;
     entry.filename = filename;
-    entry.inodeNumber = static_cast<uint64_t>(files.size());
+    entry.inodeNumber = inodeNumber;
     files.push_back(entry);
     return true;
 }

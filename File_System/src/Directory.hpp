@@ -15,7 +15,12 @@
  * @brief Representa un directorio que almacena referencias a archivos mediante nombre e iNode.
  */
 class Directory {
-    /**
+   
+private:
+    
+
+public:
+     /**
      * @struct Entry
      * @brief Estructura que representa una entrada en el directorio (archivo o subdirectorio).
      */
@@ -23,10 +28,7 @@ class Directory {
         std::string filename; /**< Nombre del archivo */
         uint64_t inodeNumber; /**< Número de iNode asociado al archivo */
     };
-private:
     std::vector<Entry> files; /**< Vector de entradas del directorio */
-
-public:
     /**
      * @brief Constructor por defecto del directorio.
      */
@@ -40,7 +42,7 @@ public:
      * @param filename Nombre del archivo a agregar.
      * @return true si se agregó correctamente, false si el nombre ya existe.
      */
-    bool addToDirectory(const std::string& filename);
+    bool addToDirectory(const std::string& filename, uint64_t inodeNumber);
     /**
      * @brief Elimina un archivo del directorio.
      * @param filename Nombre del archivo a eliminar.
