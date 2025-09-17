@@ -7,15 +7,16 @@
 #include "File.hpp"
 
 class Directory {
- struct Entry {
-  std::string filename;
-  uint64_t inodeNumber;
- };
+  
  private:
   
 
  public:
-  std::vector<Entry> entries;
+  struct Entry {
+    std::string filename;
+    uint64_t inodeNumber;
+  };
+  std::vector<Entry> files;
   Directory();
   ~Directory();
   bool addToDirectory(const std::string& filename, uint64_t inodeNumber);
@@ -24,5 +25,5 @@ class Directory {
   void listFiles();
   void printDirectory();
   bool repeatName(const std::string& filename);
-    
+
 };
