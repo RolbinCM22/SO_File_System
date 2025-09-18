@@ -4,28 +4,23 @@
 
 int main() {
     FileSystem fs;
-
+    fs.loadDirectory();
     // Crear un archivo nuevo
     std::string filename = "test.txt";
-    std::string permisos = "rw";
+    // std::string permisos = "rw";
     /*if (fs.createFile(filename, permisos) == 0) {
         std::cout << "Archivo creado correctamente." << std::endl;
     } else {
         std::cout << "Error al crear el archivo." << std::endl;
         return 1;
     }*/
-    std::string data = " Se ha agregado este texto.";
-    fs.openFile(filename);
-    fs.readFile(filename);
-    fs.writeFile(filename, data);
-    fs.readFile(filename);
-    fs.closeFile(filename);
-    fs.readFile(filename);
+    fs.deleteFile(filename);
+    fs.dir.printDirectory();
     // Escribir datos en el archivo
     /*std::string data = "Hola, este es un texto de prueba para el sistema de archivos. "
                        "Puedes agregar más texto para probar la asignación de varios bloques.";
     fs.writeFile(filename, data);*/
-    fs.dir.printDirectory();
+    
    /*FileSystem fs = FileSystem();
     fs.loadDirectory();
     fs.dir.printDirectory();

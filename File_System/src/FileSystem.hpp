@@ -32,12 +32,13 @@ public:
   int closeFile(const std::string& filename);
   void writeFile(std::string filename, std::string& data);
   void readFile(const std::string filename);
-  void deleteFile(const std::string& filename);
+  void deleteFile(const std::string filename);
   void searchFile(const std::string& filename);
   void saveInode(std::fstream& disk, const iNode& node, uint64_t offset);
   int initializeDirectory(); // <-- Función para inicializar el directorio
   int saveDirectory();
   int loadDirectory();
   iNode loadInode(std::fstream& disk, uint64_t offset);
+  bool renameFile(const std::string& oldName, const std::string& newName);
 };
 

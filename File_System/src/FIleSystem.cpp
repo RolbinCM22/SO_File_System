@@ -51,7 +51,7 @@ int FileSystem::loadBitMap() {
       this->bitMap[i] = true; // Bloque ocupado
     }
   }
-  for(size_t i = 0; i < 10; ++i) {
+  for(size_t i = 0; i < 15; ++i) {
     std::cout << "Block " << i << ": " << (this->bitMap[i] ? "Occupied" : "Free") << std::endl;
   }
   disk.close();
@@ -157,7 +157,7 @@ void FileSystem::saveInode(std::fstream& disk, const iNode& node, uint64_t offse
   uint64_t blocksCount = node.blockPointers.size();
   disk.write(reinterpret_cast<const char*>(&blocksCount), sizeof(blocksCount));
   for (auto block : node.blockPointers) {
-      disk.write(reinterpret_cast<const char*>(&block), sizeof(block));
+    disk.write(reinterpret_cast<const char*>(&block), sizeof(block));
   }
 }
 
@@ -309,14 +309,12 @@ void FileSystem::readFile(std::string filename) {
   iNode node = loadInode(disk, inodeNum * this->block_size);
   if(node.state != "open") {
     std::cerr << "El archivo no está abierto. Ábralo antes de leer." << std::endl;
+    disk.close();
     return;
   }
   if (inodeNum != UINT64_MAX) {
-    
+  
     std::cout << "El número de inode es: " << inodeNum << std::endl;
-    
-
-    
     std::string data;
     for(auto block : node.blockPointers) {
       char buffer[256] = {0};
@@ -328,6 +326,38 @@ void FileSystem::readFile(std::string filename) {
     disk.close();
   } else {
     std::cout << "Archivo no encontrado." << std::endl;
-  }
-  
+  }  
 }
+
+void FileSystem::deleteFile(const std::string filename) {
+  uint64_t inodeNum = this->dir.findInDirectory(filename);
+  
+  std::fstream disk("./data/unity.bin", std::ios::in | std::ios::out | std::ios::binary);
+    if (!disk) {
+      std::cerr << "Error initializing the disk" << std::endl;
+      return;
+    }
+  if (inodeNum != UINT64_MAX) {
+    iNode node = loadInode(disk, inodeNum * this->block_size);
+    for(auto block : node.blockPointers) {
+      char zero = 0;
+      disk.seekp(block * this->block_size, std::ios::beg);
+      disk.write(&zero, sizeof(zero));
+      this->bitMap[block] = false;
+    }
+    char zero = 0;
+    disk.seekp(inodeNum * this->block_size, std::ios::beg);
+    disk.write(&zero, sizeof(zero));
+    this->bitMap[inodeNum] = false;
+    this->dir.removeFromDirectory(filename);
+    saveDirectory();
+
+    std::cout << "Archivo eliminado correctamente." << std::endl;
+    disk.close();
+  } else {
+    std::cout << "Archivo no encontrado." << std::endl;
+    disk.close();
+  }
+}
+  
+
