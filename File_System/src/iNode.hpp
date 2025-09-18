@@ -27,9 +27,9 @@ struct iNode {
   /** File size in blocks.*/
   uint64_t fileSize;
   /** File creation timestamp*/
- // std::time_t creationTime;
+  std::time_t creationTime;
   /** File last modification timestamp.*/
- // std::time_t modificationTime;
+  std::time_t modificationTime;
   /** File related block pointers.*/
   std::vector<uint64_t> blockPointers;
   /** File declared permissions.*/

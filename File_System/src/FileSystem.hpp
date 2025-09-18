@@ -30,7 +30,7 @@ public:
   int createFile(const std::string& filename, std::string permissions);
   int openFile(const std::string& filename);
   int closeFile(const std::string& filename);
-  void writeFile(std::string identified, std::string& data);
+  void writeFile(std::string filename, std::string& data);
   void readFile(uint64_t* location);
   void deleteFile(const std::string& filename);
   void searchFile(const std::string& filename);
@@ -38,5 +38,6 @@ public:
   int initializeDirectory(); // <-- Función para inicializar el directorio
   int saveDirectory();
   int loadDirectory();
+  iNode loadInode(std::fstream& disk, uint64_t offset);
 };
 

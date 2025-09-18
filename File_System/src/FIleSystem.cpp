@@ -1,5 +1,7 @@
 #include <fstream>
 #include "FileSystem.hpp"
+#include "File.hpp"
+#include <iostream>
 
 FileSystem::FileSystem(){
   this->name = "MyFileSystem";
@@ -27,7 +29,6 @@ int FileSystem::initializeDirectory(){
 
   loadDirectory();
   loadBitMap();
- 
   std::cout << "Disk initialized successfully." << std::endl;
   return 0;
 }
@@ -50,7 +51,7 @@ int FileSystem::loadBitMap() {
       this->bitMap[i] = true; // Bloque ocupado
     }
   }
-  for(size_t i = 0; i < 5; ++i) {
+  for(size_t i = 0; i < 10; ++i) {
     std::cout << "Block " << i << ": " << (this->bitMap[i] ? "Occupied" : "Free") << std::endl;
   }
   disk.close();
@@ -63,11 +64,6 @@ int FileSystem::createFile(const std::string& filename, std::string permissions)
     return -1;
   }
 
-  iNode newFile;
-  newFile.name = filename;
-  newFile.state = "closed";
-  newFile.type = "txt";
-  newFile.permissions = permissions;
   uint64_t freeblock = 0;
   for(size_t i = 3; i < this->bitMap.size(); ++i) {
     if(!this->bitMap[i]) {
@@ -76,16 +72,18 @@ int FileSystem::createFile(const std::string& filename, std::string permissions)
       break;
     }
   }
-  newFile.id = freeblock;
-  this->dir.addToDirectory(filename, newFile.id);
+  
+  File newFile(freeblock, filename, permissions, freeblock);
+  this->dir.addToDirectory(filename, newFile.getMetadata().id);
 
   std::fstream disk("./data/unity.bin", std::ios::in | std::ios::out | std::ios::binary);
   if (!disk) {
     std::cerr << "Error initializing the disk" << std::endl;
     return -1;
   }
-  saveInode(disk, newFile, freeblock * this->block_size);
-  
+  saveInode(disk, newFile.getMetadata(), freeblock * this->block_size);
+  saveDirectory();
+  disk.close();
   dir.printDirectory();  
   return 0;
 }
@@ -138,9 +136,9 @@ void FileSystem::saveInode(std::fstream& disk, const iNode& node, uint64_t offse
   disk.write(node.permissions.c_str(), permissionsLen);
   
   
-  uint64_t blocksCount = node.BlockPointers.size();
+  uint64_t blocksCount = node.blockPointers.size();
   disk.write(reinterpret_cast<const char*>(&blocksCount), sizeof(blocksCount));
-  for (auto block : node.BlockPointers) {
+  for (auto block : node.blockPointers) {
       disk.write(reinterpret_cast<const char*>(&block), sizeof(block));
   }
 }
@@ -148,7 +146,7 @@ void FileSystem::saveInode(std::fstream& disk, const iNode& node, uint64_t offse
 int FileSystem::saveDirectory() {
   std::fstream disk("./data/unity.bin", std::ios::in | std::ios::out | std::ios::binary);
   if (!disk) {
-      std::cerr << "Error initializing the disk" << std::endl;
+    std::cerr << "Error initializing the disk" << std::endl;
   }
 
   disk.seekp(this->directionDirectory * this->block_size, std::ios::beg);
@@ -204,3 +202,78 @@ void FileSystem::resetUnity() {
   disk.close();
 }
 
+void FileSystem::writeFile(std::string filename, std::string& data) {
+  uint64_t inodeNum = dir.findInDirectory(filename);
+  if (inodeNum != UINT64_MAX) {
+    
+    std::cout << "El número de inode es: " << inodeNum << std::endl;
+    
+    
+    std::fstream disk("./data/unity.bin", std::ios::in | std::ios::out | std::ios::binary);
+    if (!disk) {
+      std::cerr << "Error initializing the disk" << std::endl;
+      return;
+    }
+    size_t quantityBlocks = (data.size() + this->block_size - 1) / this->block_size;
+    iNode node = loadInode(disk, inodeNum * this->block_size);
+    for(size_t i = 0; i < quantityBlocks; ++i) {
+      for(size_t j = 3; j < this->bitMap.size(); ++j) {
+        if(!this->bitMap[j]) {
+          this->bitMap[j] = true;
+          disk.seekp(j * this->block_size, std::ios::beg);
+          disk.write(data.c_str() + i * this->block_size, std::min(this->block_size, data.size() - i * this->block_size));
+          node.blockPointers.push_back(j);
+          break;
+        }
+      }
+    }
+    saveInode(disk, node, inodeNum * this->block_size);
+    disk.close();
+
+  } else {
+    std::cout << "Archivo no encontrado." << std::endl;
+  }
+
+}
+
+iNode FileSystem::loadInode(std::fstream& disk, uint64_t offset) {
+    iNode node;
+    disk.seekg(offset, std::ios::beg);
+
+    // Leer y reconstruir el nombre
+    uint64_t nameLen;
+    disk.read(reinterpret_cast<char*>(&nameLen), sizeof(nameLen));
+    node.name.resize(nameLen);
+    disk.read(&node.name[0], nameLen);
+
+    // Leer y reconstruir el tipo
+    uint64_t typeLen;
+    disk.read(reinterpret_cast<char*>(&typeLen), sizeof(typeLen));
+    node.type.resize(typeLen);
+    disk.read(&node.type[0], typeLen);
+
+    // Leer y reconstruir el estado
+    uint64_t stateLen;
+    disk.read(reinterpret_cast<char*>(&stateLen), sizeof(stateLen));
+    node.state.resize(stateLen);
+    disk.read(&node.state[0], stateLen);
+
+    // Leer el id
+    disk.read(reinterpret_cast<char*>(&node.id), sizeof(node.id));
+
+    // Leer y reconstruir los permisos
+    uint64_t permissionsLen;
+    disk.read(reinterpret_cast<char*>(&permissionsLen), sizeof(permissionsLen));
+    node.permissions.resize(permissionsLen);
+    disk.read(&node.permissions[0], permissionsLen);
+
+    // Leer los bloques asignados
+    uint64_t blocksCount;
+    disk.read(reinterpret_cast<char*>(&blocksCount), sizeof(blocksCount));
+    node.blockPointers.resize(blocksCount);
+    for (uint64_t i = 0; i < blocksCount; ++i) {
+        disk.read(reinterpret_cast<char*>(&node.blockPointers[i]), sizeof(uint64_t));
+    }
+
+    return node;
+}
