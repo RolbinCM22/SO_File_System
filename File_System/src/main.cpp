@@ -14,7 +14,7 @@ int main() {
         std::cout << "Error al crear el archivo." << std::endl;
         return 1;
     }*/
-    fs.deleteFile(filename);
+   //fs.deleteFile(filename);
     fs.dir.printDirectory();
     // Escribir datos en el archivo
     /*std::string data = "Hola, este es un texto de prueba para el sistema de archivos. "

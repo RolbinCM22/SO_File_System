@@ -91,13 +91,13 @@ int FileSystem::createFile(const std::string& filename, std::string permissions)
 
 int FileSystem::openFile(const std::string filename) {
   uint64_t inodeNum = this->dir.findInDirectory(filename);
-  std::fstream disk("./data/unity.bin", std::ios::in | std::ios::out | std::ios::binary);
-  if (!disk) {
-    std::cerr << "Error initializing the disk" << std::endl;
-    return -1;
-  }
-  iNode node = loadInode(disk, inodeNum * this->block_size);
   if (inodeNum != UINT64_MAX) {
+    std::fstream disk("./data/unity.bin", std::ios::in | std::ios::out | std::ios::binary);
+    if (!disk) {
+      std::cerr << "Error initializing the disk" << std::endl;
+      return -1;
+    }
+    iNode node = loadInode(disk, inodeNum * this->block_size);
     std::cout << "Abriendo archivo: " << filename << " con iNode: " << inodeNum << std::endl;
     node.state = "open";
     saveInode(disk, node, inodeNum * this->block_size);
@@ -111,13 +111,13 @@ int FileSystem::openFile(const std::string filename) {
 
 int FileSystem::closeFile(const std::string& filename) {
   uint64_t inodeNum = this->dir.findInDirectory(filename);
-   std::fstream disk("./data/unity.bin", std::ios::in | std::ios::out | std::ios::binary);
+  if (inodeNum != UINT64_MAX) {
+    std::fstream disk("./data/unity.bin", std::ios::in | std::ios::out | std::ios::binary);
     if (!disk) {
       std::cerr << "Error initializing the disk" << std::endl;
       return -1;
     }
-  iNode node = loadInode(disk, inodeNum * this->block_size);
-  if (inodeNum != UINT64_MAX) {
+    iNode node = loadInode(disk, inodeNum * this->block_size);
     std::cout << "Abriendo archivo: " << filename << " con iNode: " << inodeNum << std::endl;
     node.state = "closed";
     saveInode(disk, node, inodeNum * this->block_size);
@@ -275,8 +275,15 @@ void FileSystem::writeFile(std::string filename, std::string& data) {
       std::cerr << "Error initializing the disk" << std::endl;
       return;
     }
-    size_t quantityBlocks = (data.size() + this->block_size - 1) / this->block_size;
     iNode node = loadInode(disk, inodeNum * this->block_size);
+    if(node.state != "open") {
+      std::cerr << "El archivo no está abierto. Ábralo antes de escribir/eliminar." << std::endl;
+      disk.close();
+      return;
+    }
+
+    size_t quantityBlocks = (data.size() + this->block_size - 1) / this->block_size;
+    
     for(size_t i = 0; i < quantityBlocks; ++i) {
       for(size_t j = 3; j < this->bitMap.size(); ++j) {
         if(!this->bitMap[j]) {
@@ -299,21 +306,18 @@ void FileSystem::writeFile(std::string filename, std::string& data) {
 
 void FileSystem::readFile(std::string filename) {
   uint64_t inodeNum = this->dir.findInDirectory(filename);
-  
-  std::fstream disk("./data/unity.bin", std::ios::in | std::ios::out | std::ios::binary);
+  if (inodeNum != UINT64_MAX) {
+    std::fstream disk("./data/unity.bin", std::ios::in | std::ios::out | std::ios::binary);
     if (!disk) {
       std::cerr << "Error initializing the disk" << std::endl;
       return;
     }
-
   iNode node = loadInode(disk, inodeNum * this->block_size);
   if(node.state != "open") {
     std::cerr << "El archivo no está abierto. Ábralo antes de leer." << std::endl;
     disk.close();
     return;
   }
-  if (inodeNum != UINT64_MAX) {
-  
     std::cout << "El número de inode es: " << inodeNum << std::endl;
     std::string data;
     for(auto block : node.blockPointers) {
@@ -331,13 +335,12 @@ void FileSystem::readFile(std::string filename) {
 
 void FileSystem::deleteFile(const std::string filename) {
   uint64_t inodeNum = this->dir.findInDirectory(filename);
-  
-  std::fstream disk("./data/unity.bin", std::ios::in | std::ios::out | std::ios::binary);
+  if (inodeNum != UINT64_MAX) {
+    std::fstream disk("./data/unity.bin", std::ios::in | std::ios::out | std::ios::binary);
     if (!disk) {
       std::cerr << "Error initializing the disk" << std::endl;
       return;
     }
-  if (inodeNum != UINT64_MAX) {
     iNode node = loadInode(disk, inodeNum * this->block_size);
     for(auto block : node.blockPointers) {
       char zero = 0;
@@ -356,10 +359,18 @@ void FileSystem::deleteFile(const std::string filename) {
     disk.close();
   } else {
     std::cout << "Archivo no encontrado." << std::endl;
-    disk.close();
   }
 }
   
 void FileSystem::listFiles() {
     dir.listFiles();
+}
+
+void FileSystem::searchFile(const std::string& filename) {
+  uint64_t inodeNum = this->dir.findInDirectory(filename);
+  if (inodeNum != UINT64_MAX) {
+    std::cout << "Archivo encontrado: " << filename << " con iNode: " << inodeNum << std::endl;
+  } else {
+    std::cout << "Archivo no encontrado." << std::endl;
+  }
 }
