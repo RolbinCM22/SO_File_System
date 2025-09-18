@@ -31,7 +31,7 @@ public:
   int openFile(const std::string& filename);
   int closeFile(const std::string& filename);
   void writeFile(std::string filename, std::string& data);
-  void readFile(uint64_t* location);
+  void readFile(const std::string filename);
   void deleteFile(const std::string& filename);
   void searchFile(const std::string& filename);
   void saveInode(std::fstream& disk, const iNode& node, uint64_t offset);

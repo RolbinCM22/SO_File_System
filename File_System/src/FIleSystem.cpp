@@ -7,8 +7,8 @@ FileSystem::FileSystem(){
   this->name = "MyFileSystem";
   this->block_size = 256; // 256 bits = 32 bytes
   this->size = 1024 * 1024 * 1024; // 1 GB
-
   initializeDirectory();
+  loadBitMap();
 }
 
 FileSystem::~FileSystem(){
@@ -28,7 +28,7 @@ int FileSystem::initializeDirectory(){
   disk.close();
 
   loadDirectory();
-  loadBitMap();
+  
   std::cout << "Disk initialized successfully." << std::endl;
   return 0;
 }
@@ -143,6 +143,48 @@ void FileSystem::saveInode(std::fstream& disk, const iNode& node, uint64_t offse
   }
 }
 
+iNode FileSystem::loadInode(std::fstream& disk, uint64_t offset) {
+    iNode node;
+    disk.seekg(offset, std::ios::beg);
+
+    // Leer y reconstruir el nombre
+    uint64_t nameLen;
+    disk.read(reinterpret_cast<char*>(&nameLen), sizeof(nameLen));
+    node.name.resize(nameLen);
+    disk.read(&node.name[0], nameLen);
+
+    // Leer y reconstruir el tipo
+    uint64_t typeLen;
+    disk.read(reinterpret_cast<char*>(&typeLen), sizeof(typeLen));
+    node.type.resize(typeLen);
+    disk.read(&node.type[0], typeLen);
+
+    // Leer y reconstruir el estado
+    uint64_t stateLen;
+    disk.read(reinterpret_cast<char*>(&stateLen), sizeof(stateLen));
+    node.state.resize(stateLen);
+    disk.read(&node.state[0], stateLen);
+
+    // Leer el id
+    disk.read(reinterpret_cast<char*>(&node.id), sizeof(node.id));
+
+    // Leer y reconstruir los permisos
+    uint64_t permissionsLen;
+    disk.read(reinterpret_cast<char*>(&permissionsLen), sizeof(permissionsLen));
+    node.permissions.resize(permissionsLen);
+    disk.read(&node.permissions[0], permissionsLen);
+
+    // Leer los bloques asignados
+    uint64_t blocksCount;
+    disk.read(reinterpret_cast<char*>(&blocksCount), sizeof(blocksCount));
+    node.blockPointers.resize(blocksCount);
+    for (uint64_t i = 0; i < blocksCount; ++i) {
+        disk.read(reinterpret_cast<char*>(&node.blockPointers[i]), sizeof(uint64_t));
+    }
+
+    return node;
+}
+
 int FileSystem::saveDirectory() {
   std::fstream disk("./data/unity.bin", std::ios::in | std::ios::out | std::ios::binary);
   if (!disk) {
@@ -162,6 +204,7 @@ int FileSystem::saveDirectory() {
   disk.close();
   return 0;
 }
+
 int FileSystem::loadDirectory() {
   std::fstream disk("./data/unity.bin", std::ios::in | std::ios::binary);
   if (!disk) {
@@ -203,11 +246,10 @@ void FileSystem::resetUnity() {
 }
 
 void FileSystem::writeFile(std::string filename, std::string& data) {
-  uint64_t inodeNum = dir.findInDirectory(filename);
+  uint64_t inodeNum = this->dir.findInDirectory(filename);
   if (inodeNum != UINT64_MAX) {
     
     std::cout << "El número de inode es: " << inodeNum << std::endl;
-    
     
     std::fstream disk("./data/unity.bin", std::ios::in | std::ios::out | std::ios::binary);
     if (!disk) {
@@ -236,44 +278,29 @@ void FileSystem::writeFile(std::string filename, std::string& data) {
 
 }
 
-iNode FileSystem::loadInode(std::fstream& disk, uint64_t offset) {
-    iNode node;
-    disk.seekg(offset, std::ios::beg);
-
-    // Leer y reconstruir el nombre
-    uint64_t nameLen;
-    disk.read(reinterpret_cast<char*>(&nameLen), sizeof(nameLen));
-    node.name.resize(nameLen);
-    disk.read(&node.name[0], nameLen);
-
-    // Leer y reconstruir el tipo
-    uint64_t typeLen;
-    disk.read(reinterpret_cast<char*>(&typeLen), sizeof(typeLen));
-    node.type.resize(typeLen);
-    disk.read(&node.type[0], typeLen);
-
-    // Leer y reconstruir el estado
-    uint64_t stateLen;
-    disk.read(reinterpret_cast<char*>(&stateLen), sizeof(stateLen));
-    node.state.resize(stateLen);
-    disk.read(&node.state[0], stateLen);
-
-    // Leer el id
-    disk.read(reinterpret_cast<char*>(&node.id), sizeof(node.id));
-
-    // Leer y reconstruir los permisos
-    uint64_t permissionsLen;
-    disk.read(reinterpret_cast<char*>(&permissionsLen), sizeof(permissionsLen));
-    node.permissions.resize(permissionsLen);
-    disk.read(&node.permissions[0], permissionsLen);
-
-    // Leer los bloques asignados
-    uint64_t blocksCount;
-    disk.read(reinterpret_cast<char*>(&blocksCount), sizeof(blocksCount));
-    node.blockPointers.resize(blocksCount);
-    for (uint64_t i = 0; i < blocksCount; ++i) {
-        disk.read(reinterpret_cast<char*>(&node.blockPointers[i]), sizeof(uint64_t));
+void FileSystem::readFile(std::string filename) {
+  uint64_t inodeNum = this->dir.findInDirectory(filename);
+  if (inodeNum != UINT64_MAX) {
+    
+    std::cout << "El número de inode es: " << inodeNum << std::endl;
+    std::fstream disk("./data/unity.bin", std::ios::in | std::ios::out | std::ios::binary);
+    if (!disk) {
+      std::cerr << "Error initializing the disk" << std::endl;
+      return;
     }
 
-    return node;
+    iNode node = loadInode(disk, inodeNum * this->block_size);
+    std::string data;
+    for(auto block : node.blockPointers) {
+      char buffer[256] = {0};
+      disk.seekg(block * this->block_size, std::ios::beg);
+      disk.read(buffer, this->block_size);
+      data.append(buffer, this->block_size);
+    }
+    std::cout << "Data read from file: " << data << std::endl;
+    disk.close();
+  } else {
+    std::cout << "Archivo no encontrado." << std::endl;
+  }
+  
 }

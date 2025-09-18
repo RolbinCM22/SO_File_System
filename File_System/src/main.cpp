@@ -8,13 +8,13 @@ int main() {
     // Crear un archivo nuevo
     std::string filename = "test.txt";
     std::string permisos = "rw";
-    if (fs.createFile(filename, permisos) == 0) {
+    /*if (fs.createFile(filename, permisos) == 0) {
         std::cout << "Archivo creado correctamente." << std::endl;
     } else {
         std::cout << "Error al crear el archivo." << std::endl;
         return 1;
-    }
-
+    }*/
+    fs.readFile(filename);
     // Escribir datos en el archivo
     /*std::string data = "Hola, este es un texto de prueba para el sistema de archivos. "
                        "Puedes agregar más texto para probar la asignación de varios bloques.";
