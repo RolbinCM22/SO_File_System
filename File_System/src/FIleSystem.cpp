@@ -236,6 +236,10 @@ void FileSystem::writeFile(std::string filename, std::string& data) {
 
 }
 
+void FileSystem::listFiles() {
+    dir.listFiles();
+}
+
 iNode FileSystem::loadInode(std::fstream& disk, uint64_t offset) {
     iNode node;
     disk.seekg(offset, std::ios::beg);

@@ -33,6 +33,7 @@ public:
   void writeFile(std::string filename, std::string& data);
   void readFile(uint64_t* location);
   void deleteFile(const std::string& filename);
+  void listFiles();
   void searchFile(const std::string& filename);
   void saveInode(std::fstream& disk, const iNode& node, uint64_t offset);
   int initializeDirectory(); // <-- Función para inicializar el directorio
