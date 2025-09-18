@@ -14,6 +14,12 @@ int main() {
         std::cout << "Error al crear el archivo." << std::endl;
         return 1;
     }*/
+    std::string data = " Se ha agregado este texto.";
+    fs.openFile(filename);
+    fs.readFile(filename);
+    fs.writeFile(filename, data);
+    fs.readFile(filename);
+    fs.closeFile(filename);
     fs.readFile(filename);
     // Escribir datos en el archivo
     /*std::string data = "Hola, este es un texto de prueba para el sistema de archivos. "

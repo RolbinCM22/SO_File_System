@@ -28,7 +28,7 @@ public:
   ~FileSystem();
   Directory dir;
   int createFile(const std::string& filename, std::string permissions);
-  int openFile(const std::string& filename);
+  int openFile(const std::string filename);
   int closeFile(const std::string& filename);
   void writeFile(std::string filename, std::string& data);
   void readFile(const std::string filename);
