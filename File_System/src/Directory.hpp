@@ -69,5 +69,12 @@ public:
      * @return true si el nombre está repetido, false en caso contrario.
      */
     bool repeatName(const std::string& filename);
+    /**
+     * @brief Renombra un archivo en el directorio.
+     * @param oldName Nombre actual del archivo.
+     * @param newName Nuevo nombre para el archivo.
+     * @return true si se renombró correctamente, false si no se encontró o el nuevo nombre ya existe.
+     */
+    bool renameFile(const std::string& oldName, const std::string& newName);
     
 };

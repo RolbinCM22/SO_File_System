@@ -84,3 +84,20 @@ void Directory::printDirectory() {
 bool Directory::repeatName(const std::string& filename) {
     return findInDirectory(filename) != UINT64_MAX;
 }
+
+/**
+ * @brief Renombra un archivo en el directorio.
+ * @param oldName Nombre actual del archivo.
+ * @param newName Nuevo nombre para el archivo.
+ * @return true si se renombró correctamente, false si no se encontró o el nuevo nombre ya existe.
+ */
+bool Directory::renameFile(const std::string& oldName, const std::string& newName) {
+    if (repeatName(newName)) return false; // No permitir nombres duplicados
+    for (auto& entry : files) {
+        if (entry.filename == oldName) {
+            entry.filename = newName;
+            return true;
+        }
+    }
+    return false; // No se encontró el archivo
+}

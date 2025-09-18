@@ -40,5 +40,6 @@ public:
   int loadDirectory();
   iNode loadInode(std::fstream& disk, uint64_t offset);
   bool renameFile(const std::string& oldName, const std::string& newName);
+  void listFiles();
 };
 

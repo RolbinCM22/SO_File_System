@@ -360,4 +360,6 @@ void FileSystem::deleteFile(const std::string filename) {
   }
 }
   
-
+void FileSystem::listFiles() {
+    dir.listFiles();
+}
