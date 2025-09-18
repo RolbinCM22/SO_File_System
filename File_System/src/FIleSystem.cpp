@@ -374,3 +374,35 @@ void FileSystem::searchFile(const std::string& filename) {
     std::cout << "Archivo no encontrado." << std::endl;
   }
 }
+bool FileSystem::renameFile(const std::string& oldName, const std::string& newName) {
+  if(this->dir.repeatName(newName)) {
+    std::cerr << "El nuevo nombre ya existe." << std::endl;
+    return false;
+  }
+  bool result = this->dir.renameFile(oldName, newName);
+  if(result) {
+    saveDirectory();
+    uint64_t inodeNum = this->dir.findInDirectory(oldName);
+    if (inodeNum != UINT64_MAX) {
+      std::fstream disk("./data/unity.bin", std::ios::in | std::ios::out | std::ios::binary);
+      if (!disk) {
+        std::cerr << "Error initializing the disk" << std::endl;
+        return false;
+      }
+      iNode node = loadInode(disk, inodeNum * this->block_size);
+      node.name = newName;
+      saveInode(disk, node, inodeNum * this->block_size);
+      disk.close();
+    }
+    std::cout << "Archivo renombrado correctamente de '" << oldName << "' a '" << newName << "'." << std::endl;
+  } else {
+    std::cerr << "No se pudo renombrar el archivo. Verifique que el archivo exista." << std::endl;
+  }
+  return result;
+}
+
+void FileSystem::printBitMap() {
+  for(size_t i = 0; i < 15; ++i) {
+    std::cout << "Block " << i << ": " << (this->bitMap[i] ? "Occupied" : "Free") << std::endl;
+  }
+}
