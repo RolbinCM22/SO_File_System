@@ -34,6 +34,7 @@ Este se implementa mediante una clase llamada directorio, la cual posee una tabl
 El control de acceso se realiza mediante la dependencia de la identidad del usuario, ya que diversos usuarios pueden necesitar diferentes tipos de acceso. Para esto se utiliza una lista de control de acceso (ACL), en la cual se almacenan los nombres de usuario y los tipos de acceso.
 
 ##### - Cómo se controla que no haya errores en el funcionamiento general del file system?
+Para esto es fundamental el uso de un directorio mediante el cual se accede a los archivos y su respectivo nodos indice, este se permite eliminar, acceder, escribir y leer sobre los archivos existentes . Esto controla los accesos a la unidad, asimismo se utiliza un bitmap con el fin de facilitar la gestión del almacenamiento, evitando que se sobreescriban datos y se aproveche los bloques libres. Por ultimo, se utilizan validaciones en las funciones para evitar accesos incorrectos.   
 
 ##### - Cómo se pueden modificar los metadatos de un archivo?
 Esto se puede realizar mediante funciones que permiten modificar los metadatos según los permisos del usuario en el directorio. Lo cual también se va a reflejar en los metadatos del archivo.
