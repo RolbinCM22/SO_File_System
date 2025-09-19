@@ -60,7 +60,7 @@ int FileSystem::loadBitMap() {
 }
 int FileSystem::createFile(const std::string& filename, std::string permissions) {
   if(this->dir.repeatName(filename)) {
-    std::cerr << "El archivo ya existe." << std::endl;
+    std::cerr << "File already exists." << std::endl;
     return -1;
   }
 
@@ -98,13 +98,13 @@ int FileSystem::openFile(const std::string filename) {
       return -1;
     }
     iNode node = loadInode(disk, inodeNum * this->block_size);
-    std::cout << "Abriendo archivo: " << filename << " con iNode: " << inodeNum << std::endl;
+    std::cout << "Opening file: " << filename << " with iNode: " << inodeNum << std::endl;
     node.state = "open";
     saveInode(disk, node, inodeNum * this->block_size);
     disk.close();
     return 0;
   } else {
-    std::cout << "Archivo no encontrado." << std::endl;
+    std::cout << "File not found." << std::endl;
     return -1;
   }
 }
@@ -118,13 +118,13 @@ int FileSystem::closeFile(const std::string& filename) {
       return -1;
     }
     iNode node = loadInode(disk, inodeNum * this->block_size);
-    std::cout << "Abriendo archivo: " << filename << " con iNode: " << inodeNum << std::endl;
+    std::cout << "Opening file: " << filename << " with iNode: " << inodeNum << std::endl;
     node.state = "closed";
     saveInode(disk, node, inodeNum * this->block_size);
     disk.close();
     return 0;
   } else {
-    std::cout << "Archivo no encontrado." << std::endl;
+    std::cout << "File not found." << std::endl;
     return -1;
   }
 }
@@ -132,7 +132,7 @@ int FileSystem::closeFile(const std::string& filename) {
 
 void FileSystem::saveInode(std::fstream& disk, const iNode& node, uint64_t offset) {
   disk.seekp(offset, std::ios::beg);
-
+  // Escribir y serializar la estructura iNode
   uint64_t nameLen = node.name.size();
   disk.write(reinterpret_cast<const char*>(&nameLen), sizeof(nameLen));
   disk.write(node.name.c_str(), nameLen);
@@ -165,34 +165,30 @@ iNode FileSystem::loadInode(std::fstream& disk, uint64_t offset) {
     iNode node;
     disk.seekg(offset, std::ios::beg);
 
-    // Leer y reconstruir el nombre
+    // Leer y reconstruir la estructura iNode
     uint64_t nameLen;
     disk.read(reinterpret_cast<char*>(&nameLen), sizeof(nameLen));
     node.name.resize(nameLen);
     disk.read(&node.name[0], nameLen);
 
-    // Leer y reconstruir el tipo
     uint64_t typeLen;
     disk.read(reinterpret_cast<char*>(&typeLen), sizeof(typeLen));
     node.type.resize(typeLen);
     disk.read(&node.type[0], typeLen);
 
-    // Leer y reconstruir el estado
+
     uint64_t stateLen;
     disk.read(reinterpret_cast<char*>(&stateLen), sizeof(stateLen));
     node.state.resize(stateLen);
     disk.read(&node.state[0], stateLen);
 
-    // Leer el id
     disk.read(reinterpret_cast<char*>(&node.id), sizeof(node.id));
 
-    // Leer y reconstruir los permisos
     uint64_t permissionsLen;
     disk.read(reinterpret_cast<char*>(&permissionsLen), sizeof(permissionsLen));
     node.permissions.resize(permissionsLen);
     disk.read(&node.permissions[0], permissionsLen);
 
-    // Leer los bloques asignados
     uint64_t blocksCount;
     disk.read(reinterpret_cast<char*>(&blocksCount), sizeof(blocksCount));
     node.blockPointers.resize(blocksCount);
@@ -213,10 +209,10 @@ int FileSystem::saveDirectory() {
   uint64_t filesCount = this->dir.files.size();
   disk.write(reinterpret_cast<const char*>(&filesCount), sizeof(filesCount));
   for (const auto& entry : this->dir.files) {
-      uint64_t nameLen = entry.filename.size();
-      disk.write(reinterpret_cast<const char*>(&nameLen), sizeof(nameLen));
-      disk.write(entry.filename.c_str(), nameLen);
-      disk.write(reinterpret_cast<const char*>(&entry.inodeNumber), sizeof(entry.inodeNumber));
+    uint64_t nameLen = entry.filename.size();
+    disk.write(reinterpret_cast<const char*>(&nameLen), sizeof(nameLen));
+    disk.write(entry.filename.c_str(), nameLen);
+    disk.write(reinterpret_cast<const char*>(&entry.inodeNumber), sizeof(entry.inodeNumber));
   }
   std::cout << "Directory saved successfully." << std::endl;
   disk.close();
@@ -267,9 +263,9 @@ void FileSystem::writeFile(std::string filename, std::string& data) {
   
   uint64_t inodeNum = this->dir.findInDirectory(filename);
   if (inodeNum != UINT64_MAX) {
-    
-    std::cout << "El número de inode es: " << inodeNum << std::endl;
-    
+
+    std::cout << "iNode number is: " << inodeNum << std::endl;
+
     std::fstream disk("./data/unity.bin", std::ios::in | std::ios::out | std::ios::binary);
     if (!disk) {
       std::cerr << "Error initializing the disk" << std::endl;
@@ -277,7 +273,7 @@ void FileSystem::writeFile(std::string filename, std::string& data) {
     }
     iNode node = loadInode(disk, inodeNum * this->block_size);
     if(node.state != "open") {
-      std::cerr << "El archivo no está abierto. Ábralo antes de escribir/eliminar." << std::endl;
+      std::cerr << "The file is not open. Open it before writing/deleting." << std::endl;
       disk.close();
       return;
     }
@@ -299,7 +295,7 @@ void FileSystem::writeFile(std::string filename, std::string& data) {
     disk.close();
 
   } else {
-    std::cout << "Archivo no encontrado." << std::endl;
+    std::cout << "File not found." << std::endl;
   }
 
 }
@@ -314,11 +310,11 @@ void FileSystem::readFile(std::string filename) {
     }
   iNode node = loadInode(disk, inodeNum * this->block_size);
   if(node.state != "open") {
-    std::cerr << "El archivo no está abierto. Ábralo antes de leer." << std::endl;
+    std::cerr << "The file is not open. Open it before reading." << std::endl;
     disk.close();
     return;
   }
-    std::cout << "El número de inode es: " << inodeNum << std::endl;
+    std::cout << "iNode number is: " << inodeNum << std::endl;
     std::string data;
     for(auto block : node.blockPointers) {
       char buffer[256] = {0};
@@ -329,7 +325,7 @@ void FileSystem::readFile(std::string filename) {
     std::cout << "Data read from file: " << data << std::endl;
     disk.close();
   } else {
-    std::cout << "Archivo no encontrado." << std::endl;
+    std::cout << "File not found." << std::endl;
   }  
 }
 
@@ -355,10 +351,10 @@ void FileSystem::deleteFile(const std::string filename) {
     this->dir.removeFromDirectory(filename);
     saveDirectory();
 
-    std::cout << "Archivo eliminado correctamente." << std::endl;
+    std::cout << "File deleted successfully." << std::endl;
     disk.close();
   } else {
-    std::cout << "Archivo no encontrado." << std::endl;
+    std::cout << "File not found." << std::endl;
   }
 }
   
@@ -369,14 +365,14 @@ void FileSystem::listFiles() {
 void FileSystem::searchFile(const std::string& filename) {
   uint64_t inodeNum = this->dir.findInDirectory(filename);
   if (inodeNum != UINT64_MAX) {
-    std::cout << "Archivo encontrado: " << filename << " con iNode: " << inodeNum << std::endl;
+    std::cout << "File found: " << filename << " with iNode: " << inodeNum << std::endl;
   } else {
-    std::cout << "Archivo no encontrado." << std::endl;
+    std::cout << "File not found." << std::endl;
   }
 }
 bool FileSystem::renameFile(const std::string& oldName, const std::string& newName) {
   if(this->dir.repeatName(newName)) {
-    std::cerr << "El nuevo nombre ya existe." << std::endl;
+    std::cerr << "The new name already exists." << std::endl;
     return false;
   }
   bool result = this->dir.renameFile(oldName, newName);
@@ -394,9 +390,9 @@ bool FileSystem::renameFile(const std::string& oldName, const std::string& newNa
       saveInode(disk, node, inodeNum * this->block_size);
       disk.close();
     }
-    std::cout << "Archivo renombrado correctamente de '" << oldName << "' a '" << newName << "'." << std::endl;
+    std::cout << "File renamed successfully from '" << oldName << "' to '" << newName << "'." << std::endl;
   } else {
-    std::cerr << "No se pudo renombrar el archivo. Verifique que el archivo exista." << std::endl;
+    std::cerr << "Failed to rename the file. Please check if the file exists." << std::endl;
   }
   return result;
 }
