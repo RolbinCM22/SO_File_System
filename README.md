@@ -1,5 +1,10 @@
 # Tarea 1 - File System
-Conteste las siguientes preguntas:
+## Estudiantes
+Aaron Carmona Sánchez - C21705
+Jhonny Leung Quesada - C34259
+Rolbin Castillo Matamoros - B81771
+
+#### Conteste las siguientes preguntas:
 ##### - Cuáles serían los metadatos del filesystem? <- Esos serían atributos del file system
 Nombre
 Tamaño total
