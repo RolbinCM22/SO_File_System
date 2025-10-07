@@ -1,0 +1,218 @@
+// ---------- helpers ----------
+static std::mt19937_64& rng() {
+    static std::mt19937_64 g(123456789ULL); // semilla fija para reproducibilidad
+    return g;
+}
+
+static std::string randPayload(size_t n) {
+    std::string s;
+    s.resize(n);
+    std::uniform_int_distribution<int> d(0, 61);
+    for (size_t i = 0; i < n; ++i) {
+        int v = d(rng());
+        if (v < 10) s[i] = char('0' + v);
+        else if (v < 36) s[i] = char('A' + (v - 10));
+        else s[i] = char('a' + (v - 36));
+    }
+    return s;
+}
+static void check(bool cond, const char* msg) {
+    if (!cond) {
+        std::cerr << "[FAIL] " << msg << "\n";
+        std::exit(1);
+    }
+}
+
+// ---------- pruebas dirigidas ----------
+static void test_direct_vs_indirect(FileSystem& fs) {
+    std::cout << "\n[Case] direct vs indirect boundaries\n";
+
+    const size_t BLOCK = Layout::BLOCK_SIZE;             // 256
+    const size_t DIRECT_COUNT = 10;
+    const size_t DIRECT_BYTES = BLOCK * DIRECT_COUNT;    // 2560
+
+    // A: exactamente al límite de directos (no debe usar indirecto)
+    {
+        const std::string name = "limite_directo.bin";
+        int ino = fs.create(name);
+        check(ino >= 0, "create limite_directo");
+        std::string p = randPayload(DIRECT_BYTES);
+        check(fs.write(name, p), "write limite_directo");
+        auto out = fs.read(name);
+        check(out == p, "readback limite_directo");
+    }
+
+    // B: 1 byte más que el límite → fuerza uso de indirecto
+    {
+        const std::string name = "requiere_indirecto.bin";
+        int ino = fs.create(name);
+        check(ino >= 0, "create requiere_indirecto");
+        std::string p = randPayload(DIRECT_BYTES + 1);   // 2561
+        check(fs.write(name, p), "write requiere_indirecto");
+        auto out = fs.read(name);
+        check(out == p, "readback requiere_indirecto");
+    }
+
+    // C: tamaño grande que usa varios punteros indirectos
+    {
+        const std::string name = "indirecto_grande.bin";
+        int ino = fs.create(name);
+        check(ino >= 0, "create indirecto_grande");
+
+        // Indirecto guarda 64 punteros → 64*256 = 16384 bytes
+        // más 2560 de directos → ~18944 bytes. Probamos con ~18k.
+        size_t big = 18000;
+        std::string p = randPayload(big);
+        check(fs.write(name, p), "write indirecto_grande");
+        auto out = fs.read(name);
+        check(out == p, "readback indirecto_grande");
+    }
+
+    std::cout << "[OK] direct/indirect boundaries\n";
+}
+
+static void test_create_read_remove(FileSystem& fs) {
+    std::cout << "\n[Case] create → write → read → remove\n";
+    const std::string name = "hola.txt";
+    int ino = fs.create(name);
+    check(ino >= 0, "create hola.txt");
+
+    std::string data = "Hola mundo desde el FS!";
+    check(fs.write(name, data), "write hola.txt");
+    auto out = fs.read(name);
+    check(out == data, "readback hola.txt");
+
+    check(fs.remove(name), "remove hola.txt");
+    check(fs.find(name) == -1, "find after remove");
+    std::cout << "[OK] create/read/remove\n";
+}
+
+// ---------- estrés masivo ----------
+static void test_bulk_create(FileSystem& fs, size_t N, size_t maxBytes) {
+    std::cout << "\n[Case] bulk create+write+verify N=" << N << "\n";
+    std::vector<std::string> names;
+    names.reserve(N);
+    std::unordered_map<std::string, std::string> expected;
+
+    std::uniform_int_distribution<size_t> sizeDist(0, maxBytes);
+
+    for (size_t i = 0; i < N; ++i) {
+        std::string name = "file_" + std::to_string(i) + ".bin";
+        names.push_back(name);
+
+        int ino = fs.create(name);
+        check(ino >= 0, "bulk create");
+
+        size_t sz = sizeDist(rng());
+        std::string payload = randPayload(sz);
+        expected[name] = payload;
+
+        check(fs.write(name, payload), "bulk write");
+    }
+
+    // Verificación
+    for (size_t i = 0; i < N; ++i) {
+        auto got = fs.read(names[i]);
+        check(got == expected[names[i]], "bulk readback");
+    }
+    std::cout << "[OK] bulk create/write/verify\n";
+}
+
+static void test_churn(FileSystem& fs, size_t ops, size_t maxBytes) {
+    std::cout << "\n[Case] churn aleatorio ops=" << ops << "\n";
+
+    std::unordered_map<std::string, std::string> table; // nombre → contenido esperado
+    std::uniform_int_distribution<int> opDist(0, 2);    // 0=create, 1=write, 2=delete
+    std::uniform_int_distribution<size_t> sizeDist(0, maxBytes);
+
+    auto pickName = [&]() {
+        return "rnd_" + std::to_string(rng()() & 0xFFFFF) + ".bin";
+    };
+
+    for (size_t i = 0; i < ops; ++i) {
+        int op = opDist(rng());
+
+        if (op == 0) { // create
+            std::string n = pickName();
+            if (table.count(n) == 0) {
+                int ino = fs.create(n);
+                if (ino >= 0) {
+                    table[n] = ""; // vacío por ahora
+                }
+            }
+        } else if (op == 1) { // write (si no existe, crea)
+            std::string n = pickName();
+            if (table.count(n) == 0) {
+                int ino = fs.create(n);
+                if (ino < 0) continue;
+                table[n] = "";
+            }
+            std::string payload = randPayload(sizeDist(rng()));
+            if (fs.write(n, payload)) {
+                table[n] = payload;
+                // verificación puntual
+                auto got = fs.read(n);
+                check(got == payload, "churn write/readback");
+            }
+        } else { // delete
+            if (!table.empty()) {
+                // toma cualquiera
+                auto it = table.begin();
+                std::advance(it, rng()() % table.size());
+                const std::string n = it->first;
+                if (fs.remove(n)) {
+                    table.erase(it);
+                    check(fs.find(n) == -1, "churn remove/find");
+                }
+            }
+        }
+    }
+
+    // Verificación final: lo que quede debe leerse igual
+    for (auto& kv : table) {
+        auto got = fs.read(kv.first);
+        check(got == kv.second, "churn final verify");
+    }
+    std::cout << "[OK] churn aleatorio\n";
+}
+
+static void test_persistence(const std::string& diskPath) {
+    std::cout << "\n[Case] persistencia (remount)\n";
+
+    // 1) Crea FS, formatea, escribe varios archivos
+    {
+        FileSystem fs(diskPath);
+        fs.format();   // Aseguramos un estado limpio para la prueba
+
+        const std::string a = "persist_a.txt";
+        const std::string b = "persist_b.txt";
+        const std::string c = "persist_c.txt";
+
+        fs.create(a); fs.create(b); fs.create(c);
+        std::string pa = randPayload(1000);
+        std::string pb = randPayload(3000);  // >2560, usa indirecto
+        std::string pc = randPayload(50);
+
+        fs.write(a, pa);
+        fs.write(b, pb);
+        fs.write(c, pc);
+
+        // lectura in-situ
+        check(fs.read(a) == pa, "persist pre-remount A");
+        check(fs.read(b) == pb, "persist pre-remount B");
+        check(fs.read(c) == pc, "persist pre-remount C");
+    }
+
+    // 2) Cierra el objeto, crea uno nuevo y monta
+    {
+        FileSystem fs2(diskPath);
+        // Constructor debería montar; si tu constructor no lo hace, llama fs2.mount();
+
+        // Re-lee y valida
+        check(fs2.read("persist_a.txt").size() == 1000, "persist size A");
+        check(fs2.read("persist_b.txt").size() == 3000, "persist size B");
+        check(fs2.read("persist_c.txt").size() == 50,   "persist size C");
+    }
+
+    std::cout << "[OK] persistencia\n";
+}
