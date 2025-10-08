@@ -167,6 +167,16 @@ int main() {
         std::cout << "Los cambios se guardarán automáticamente al cerrar el filesystem.\n";
         std::cout << "Ejecuta el programa nuevamente para verificar persistencia.\n"; */
         fs.listFiles();
+        fs.listFiles();
+        fs.openFile("documento.txt");
+        fs.write("documento.txt", "Probando el sistema de archivos");
+        fs.closeFile("documento.txt");
+        std::string contenido = fs.read("documento.txt");
+        std::cout << "Contenido de 'documento.txt':\n" << contenido;
+        fs.openFile("documento.txt");
+        contenido = fs.read("documento.txt");
+        std::cout << "Contenido de 'documento.txt':\n" << contenido << std::endl;
+        fs.closeFile("documento.txt");
     } catch (const std::exception& e) {
         std::cerr << "ERROR CRÍTICO: " << e.what() << std::endl;
         return 1;
