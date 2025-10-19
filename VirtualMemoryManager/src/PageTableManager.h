@@ -2,13 +2,7 @@
 #include <vector>
 #include <cstdint>
 #include "PageFaultHandler.h"
-
-
-struct pageTableEntry{
-    int8_t frameNumber = -1;
-    bool dirtyBit;
-    bool chargeInMemory;
-};
+#include "PageTableEntry.h"
 
 
 class PageTableManager {
@@ -22,7 +16,7 @@ class PageTableManager {
          * @brief Page fault handler
          * 
          */
-        PageFaultHandler* faultHandler;
+        PageFaultHandler faultHandler;
         /**
          * @brief 
          * TODO: DOCUMENTAR
@@ -72,5 +66,5 @@ class PageTableManager {
          */
         void markReferenced(uint32_t virtualPageNumber);
 
-        bool char
+        bool loadFromMemory(uint32_t virtualAddress);
 };
