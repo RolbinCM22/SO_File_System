@@ -4,7 +4,7 @@
 
 #include "CPU.h"
 #include "structures/MemoryStats.h"
-
+#include "PageTableManager.h"
 
 /**
  * @brief Test function to verify CPU-VMU connection

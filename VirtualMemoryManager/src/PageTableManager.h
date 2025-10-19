@@ -1,8 +1,15 @@
 #pragma once
 #include <vector>
 #include <cstdint>
-#include "pagetableentry.h"
-#include "pagefaulthandler.h"
+#include "PageFaultHandler.h"
+
+
+struct pageTableEntry{
+    int8_t frameNumber = -1;
+    bool dirtyBit;
+    bool chargeInMemory;
+};
+
 
 class PageTableManager {
     private:
@@ -10,20 +17,24 @@ class PageTableManager {
          * @brief table of page table entries
          * 
          */
-        std::vector<PageTableEntry> pageTable;
+        std::vector<pageTableEntry> pageTable;
         /**
          * @brief Page fault handler
          * 
          */
         PageFaultHandler* faultHandler;
+        /**
+         * @brief 
+         * TODO: DOCUMENTAR
+         */
+        int pageTableSize = 256;
+        int frameSize = 256;
     public:
         /**
          * @brief Construct a new Page Table Manager object
          * 
-         * @param numPages  Number of pages in the page table
-         * @param handler   Page fault handler
          */
-        PageTableManager(size_t numPages, PageFaultHandler* handler);
+        PageTableManager();
         /**
          * @brief Destroy the Page Table Manager object
          * 
