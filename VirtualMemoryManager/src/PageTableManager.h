@@ -71,4 +71,6 @@ class PageTableManager {
          * @param virtualPageNumber Virtual page number
          */
         void markReferenced(uint32_t virtualPageNumber);
+
+        bool char
 };
