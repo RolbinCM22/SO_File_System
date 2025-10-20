@@ -2,9 +2,7 @@
 #include <vector>
 
 PageTableManager::PageTableManager(){
-    this->pageTable.resize(this->pageTableSize); 
     faultHandler = new PageFaultHandler();
-    
 }
 
  PageTableManager::~PageTableManager(){
@@ -25,9 +23,11 @@ uint8_t extractOffset(uint32_t virtualAddress) const {
     if(isPagePresent(pageNumber)){
         physicalDirection = (pageTable[pageNumber].frameNumber * this->frameSize) + offset;
     } else {
-        this->faultHandler.handlePageFault(pageNumber);
+        uint8_t frame = this->faultHandler.handlePageFault(pageNumber, offset);
+        setFrame(pageNumber, frame); 
         std::cout << "PAGETABLEMANAGER: Direction no found" << std::endl;
-        return -1;
+        physicalDirection = (pageTable[pageNumber].frameNumber * this->frameSize) + offset;
+        return physicalDirection;
     }
 
     return physicalDirection; 
@@ -37,19 +37,14 @@ uint8_t extractOffset(uint32_t virtualAddress) const {
     pageTable[virtualPageNumber].frameNumber = _frameNumber;
     pageTable[virtualPageNumber].present = true;
     pageTable[virtualPageNumber].dirtyBit = false;
+    
  }
 
  bool PageTableManager::isPagePresent(uint32_t virtualPageNumber) const {
    return pageTable[virtualPageNumber].present;
  }
 
-void PageTableManager::markModified(uint32_t virtualAddress){
-    uint8_t pageNumber = extractPageNumber(virtualAddress);
-    if(isPagePresent(pageNumber)){
-        this->pageTable[pageNumber].dirtyBit = true;
-    } else {        
-        // TODO: pageFaultHandler.handlePageFault(pageNumber);
-        std::cout << "PAGETABLEMANAGER: Direction no found" << std::endl;
-    }
+void PageTableManager::markModified(uint8_t pageNumber){
+    this->pageTable[pageNumber].dirtyBit = true;
 }
 

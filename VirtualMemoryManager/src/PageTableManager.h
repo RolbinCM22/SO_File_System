@@ -11,7 +11,7 @@ class PageTableManager {
          * @brief table of page table entries
          * 
          */
-        std::vector<pageTableEntry> pageTable;
+        pageTableEntry pageTable[256];
         /**
          * @brief Page fault handler
          * 
@@ -21,8 +21,8 @@ class PageTableManager {
          * @brief 
          * TODO: DOCUMENTAR
          */
-        int pageTableSize = 256;
         int frameSize = 256;
+        void addToPageTable(uint8_t frame);
     public:
         /**
          * @brief Construct a new Page Table Manager object
@@ -64,7 +64,7 @@ class PageTableManager {
          * @brief Mark a page as referenced
          * @param virtualPageNumber Virtual page number
          */
-        void markReferenced(uint32_t virtualPageNumber);
+        void markReferenced(uint8_t pageNumber);
 
-        bool loadFromMemory(uint32_t virtualAddress);
+
 };
