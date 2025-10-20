@@ -2,17 +2,17 @@
 #include <vector>
 
 PageTableManager::PageTableManager(){
-    faultHandler = new PageFaultHandler();
+    
 }
 
  PageTableManager::~PageTableManager(){
 
  }
- uint8_t extractPageNumber(uint32_t virtualAddress) const {
+ uint8_t extractPageNumber(uint32_t virtualAddress) {
     return (virtualAddress >> 8) & 0xFF;
 }
 
-uint8_t extractOffset(uint32_t virtualAddress) const {
+uint8_t extractOffset(uint32_t virtualAddress) {
     return virtualAddress & 0xFF;
 }
 

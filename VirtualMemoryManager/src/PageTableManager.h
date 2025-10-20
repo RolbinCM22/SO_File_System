@@ -59,7 +59,7 @@ class PageTableManager {
          * 
          * @param virtualPageNumber Virtual page number
          */
-        void markModified(uint32_t virtualPageNumber);
+        void markModified(uint8_t virtualPageNumber);
         /**
          * @brief Mark a page as referenced
          * @param virtualPageNumber Virtual page number

@@ -1,7 +1,7 @@
 #pragma once
 #include "PhysicalMemoryManager.h"
 #include "BackingStoreManager.h"
-#include "PageTableManager.h"
+
 
 class PageFaultHandler {
     private:
@@ -27,5 +27,5 @@ public:
      * 
      * @param pageNumber The page number that caused the fault
      */
-    int8_t handlePageFault(uint8_t pageNumber, uint8_t offset);
+    uint8_t handlePageFault(uint8_t pageNumber, uint8_t offset);
 };
