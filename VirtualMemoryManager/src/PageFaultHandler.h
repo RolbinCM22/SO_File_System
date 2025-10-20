@@ -5,19 +5,16 @@
 
 class PageFaultHandler {
     private:
-    PhysicalMemoryManager* physicalMemory;
-    BackingStoreManager* backingStore;
+    PhysicalMemoryManager physicalMemory;
+    BackingStoreManager backingStore;
     
 
 public:
     /**
      * @brief Construct a new Page Fault Handler object 
      * 
-     * @param pm  Physical memory manager
-     * @param bs  Backing store manager
      */
-    PageFaultHandler(PhysicalMemoryManager* pm,
-                     BackingStoreManager* bs);
+    PageFaultHandler();
 
     /**
      * @brief Destroy the Page Fault Handler object
@@ -30,5 +27,5 @@ public:
      * 
      * @param pageNumber The page number that caused the fault
      */
-    void handlePageFault(uint32_t pageNumber);
+    int8_t handlePageFault(uint8_t pageNumber, uint8_t offset);
 };
