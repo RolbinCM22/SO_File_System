@@ -8,7 +8,7 @@
 #include <iostream>
 #include <iomanip>
 
-//#include "PageTableEntry.h" descomentar cuando se cree la clase PageTableEntry
+#include "PageTableEntry.h"
 #include "VirtualMemoryUnit.h" // for PAGE_SIZE, NUM_FRAMES
 
 /**
