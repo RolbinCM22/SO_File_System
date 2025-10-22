@@ -6,7 +6,7 @@
 #include <iomanip>
 #include <stdexcept>
 
-#include "../VirtualMemoryUnit.h"
+#include "../constans.h"
 
 /**
  * @brief Simulates secondary storage (backing store / swap file)
@@ -16,11 +16,27 @@ private:
     /// Backing store: BACKING_PAGES × PAGE_SIZE bytes
     std::array<std::array<char, PAGE_SIZE>, BACKING_PAGES> backingStore{};
 
-public:
     /**
      * @brief Construct a new Backing Store Manager object
      */
     BackingStoreManager();
+
+public:
+
+    /**
+    * @brief Returns the singleton instance of the BackingStoreManager.
+    *
+    * This method provides access to the single shared instance of the
+    * BackingStoreManager class. It ensures that only one instance exists
+    * throughout the system by creating it the first time it is called
+    * and returning the same reference on subsequent calls.
+    *
+    * @return Reference to the singleton BackingStoreManager instance.
+    */
+    static BackingStoreManager& instance() {
+      static BackingStoreManager instance;
+      return instance;
+    }
 
     /**
      * @brief Load a page from backing store into a memory buffer
