@@ -16,13 +16,13 @@ size_t PhysicalMemoryManager::allocate_frame() {
     for (size_t i = 0; i < NUM_FRAMES; ++i) {
         if (!frameUsage[i]) {
             frameUsage[i] = true;
-            return i;
+            return i+1;
         }
     }
     // No free frame found, use FIFO replacement
     size_t frameIndex = nextFrameToReplace;
     nextFrameToReplace = (nextFrameToReplace + 1) % NUM_FRAMES;
-    return frameIndex;
+    return frameIndex+1;
 }
 void PhysicalMemoryManager::free_frame(size_t frameIndex) {
     if (frameIndex >= NUM_FRAMES) {
