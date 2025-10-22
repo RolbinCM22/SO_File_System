@@ -1,13 +1,11 @@
 #include "PageTableManager.h"
 #include <vector>
 
-PageTableManager::PageTableManager(){
-    
+PageTableManager::PageTableManager() : faultHandler(PageFaultHandler::instance()) {
 }
 
- PageTableManager::~PageTableManager(){
+PageTableManager::~PageTableManager()= default;
 
- }
  uint8_t extractPageNumber(uint32_t virtualAddress) {
     return (virtualAddress >> 8) & 0xFF;
 }
