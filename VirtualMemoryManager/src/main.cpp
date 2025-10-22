@@ -4,7 +4,7 @@
 
 #include "CPU.h"
 #include "structures/MemoryStats.h"
-#include "PageTableManager.h"
+#include "pagination/PageTableManager.h"
 
 /**
  * @brief Test function to verify CPU-VMU connection
@@ -14,8 +14,8 @@ void test_cpu_vmu_connection() {
   std::cout << "=============================================\n\n";
 
   // Create components
-  MemoryStats stats;
-  VirtualMemoryUnit vmu(stats);
+  PageTableManager ptm;
+  VirtualMemoryUnit vmu(ptm);
   CPU cpu(vmu);
 
   // Test sequence - designed to test various scenarios
@@ -46,8 +46,8 @@ void test_error_handling() {
   std::cout << "\n🔧 Testing Error Handling\n";
   std::cout << "=========================\n";
 
-  MemoryStats stats;
-  VirtualMemoryUnit vmu(stats);
+  PageTableManager pageTableManager;
+  VirtualMemoryUnit vmu(pageTableManager);
 
   try {
     // Test invalid VPN

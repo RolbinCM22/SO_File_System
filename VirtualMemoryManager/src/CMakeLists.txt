@@ -14,5 +14,6 @@ add_executable(VirtualMemoryManager main.cpp
         physical/PhysicalMemoryManager.cpp
         pagination/PageFaultHandler.cpp
         pagination/PageTableManager.cpp
+        constans.h
 
 )

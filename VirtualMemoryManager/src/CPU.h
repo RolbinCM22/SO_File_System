@@ -4,8 +4,11 @@
 
 #ifndef VIRTUALMEMORYMANAGER_CPU_H
 #define VIRTUALMEMORYMANAGER_CPU_H
+#include <chrono>
 #include <iostream>
+#include <thread>
 
+#include "physical/BackingStoreManager.h"
 #include "VirtualMemoryUnit.h"
 
 
@@ -15,7 +18,6 @@
 class CPU {
 private:
   VirtualMemoryUnit& virtualMemoryUnit;
-  // BackingStoreManager& backingStore;
 
 public:
   /**
