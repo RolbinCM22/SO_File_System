@@ -46,6 +46,22 @@ public:
      * @param vpn Virtual page number
      */
     void print_page_contents(size_t vpn) const;
+
+    /**
+     * @brief Read a byte from a specific virtual page
+     * @param vpn Virtual page number
+     * @param offset Byte offset within the page
+     * @return Byte value at the specified location
+     */
+    char read_byte(size_t vpn, size_t offset) const;
+
+    /**
+     * @brief Write a byte to a specific virtual page
+     * @param vpn Virtual page number
+     * @param offset Byte offset within the page
+     * @param value Byte value to write
+     */
+    void write_byte(size_t vpn, size_t offset, char value);
 };
 
 #endif // BACKINGSTOREMANAGER_H

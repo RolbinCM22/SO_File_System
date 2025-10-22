@@ -48,5 +48,19 @@ void BackingStoreManager::print_page_contents(size_t vpn) const {
     if (PAGE_SIZE % 16 != 0) {
         std::cout << "\n";
     }
-}   
+}
+
+char BackingStoreManager::read_byte(size_t vpn, size_t offset) const {
+    if (vpn >= BACKING_PAGES || offset >= PAGE_SIZE) {
+        throw std::out_of_range("Virtual page number or offset out of range");
+    }
+    return backingStore[vpn][offset];
+}
+
+void BackingStoreManager::write_byte(size_t vpn, size_t offset, char value) {
+    if (vpn >= BACKING_PAGES || offset >= PAGE_SIZE) {
+        throw std::out_of_range("Virtual page number or offset out of range");
+    }
+    backingStore[vpn][offset] = value;
+}
 
