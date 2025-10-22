@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include <cstdint>
-#include "PageFaultHandler.h"
+#include "../pagination/PageFaultHandler.h"
 #include "../structures/PageTableEntry.h"
 
 
@@ -14,13 +14,13 @@ class PageTableManager {
         pageTableEntry pageTable[256];
         /**
          * @brief Page fault handler
-         * 
+         *
          */
-        PageFaultHandler faultHandler;
-        /**
-         * @brief 
-         * TODO: DOCUMENTAR
-         */
+        PageFaultHandler& faultHandler;
+        // /**
+        //  * @brief
+        //  * TODO: DOCUMENTAR
+        //  */
         int frameSize = 256;
         void addToPageTable(uint8_t frame);
     public:
