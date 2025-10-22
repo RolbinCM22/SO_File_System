@@ -1,34 +1,28 @@
 #ifndef VIRTUALMEMORYMANAGER_VIRTUALMEMORYUNIT_H
 #define VIRTUALMEMORYMANAGER_VIRTUALMEMORYUNIT_H
 #include <iomanip>
-#include <iostream>
 #include <stdexcept>
-#include <thread>
-#include <vector>
 
+#include "pagination/PageFaultHandler.h"
+#include "pagination/PageTableManager.h"
+#include "physical/PhysicalMemoryManager.h"
 #include "structures/MemoryStats.h"
-
-// Configuration constants
-static constexpr size_t PAGE_SIZE = 4096;           ///< Page size in bytes
-static constexpr size_t NUM_FRAMES = 4;             ///< Physical frames
-static constexpr size_t BACKING_PAGES = 64;         ///< Virtual pages
-static constexpr size_t PAGE_TABLE_WALK_COST_LEVELS = 2;  ///< Necessary indirections to reach page on logic memory.
 
 /**
  * @brief Memory Management Unit - handles virtual to physical address translation
  */
 class VirtualMemoryUnit {
 private:
-    // PageTableManager& pageTableManager;
-    // PageFaultHandler& pageFaultHandler;
-    MemoryStats& stats;
+    PageTableManager& pageTableManager;
+    PageFaultHandler& pageFaultHandler;
+    PhysicalMemoryManager& physManager;
+    MemoryStats stats;
 
 public:
     /**
      * @brief Construct a new MMU object
-     * @param stats Statistics collector reference
      */
-    explicit VirtualMemoryUnit(/** PageTableManager& ptm, PageFaultHandler& pfh,*/ MemoryStats& stats);
+    explicit VirtualMemoryUnit(PageTableManager& ptm);
 
     /**
      * @brief Read a byte from virtual memory
@@ -37,7 +31,7 @@ public:
      * @return char The read byte value
      * @throws std::out_of_range if vpn or offset are invalid
      */
-    char read_memory(size_t vpn, const size_t offset) const;
+    char read_memory(size_t vpn, size_t offset);
 
     /**
      * @brief Write a byte to virtual memory
@@ -75,7 +69,7 @@ private:
    * @param offset Byte offset within frame
    * @return char The read byte value
    */
-  char read_from_frame(size_t frame_idx, size_t offset);
+  [[nodiscard]] char read_from_frame(size_t frame_idx, size_t offset) const;
 
   /**
    * @brief Write a byte to a physical frame
@@ -83,7 +77,7 @@ private:
    * @param offset Byte offset within frame
    * @param value Byte value to write
    */
-  void write_to_frame(size_t frame_idx, size_t offset, char value);
+  void write_to_frame(size_t frame_idx, size_t offset, char value) const;
 };
 
 #endif //VIRTUALMEMORYMANAGER_VIRTUALMEMORYUNIT_H
