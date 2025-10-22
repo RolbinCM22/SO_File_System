@@ -1,11 +1,15 @@
+
 #include "PageFaultHandler.h"
 
-PageFaultHandler::PageFaultHandler(){
-    
+#include <cstdint>
+#include <iostream>
+
+PageFaultHandler::PageFaultHandler() {
+
 }
 
-PageFaultHandler::~PageFaultHandler(){
-   
+PageFaultHandler::~PageFaultHandler() {
+
 }
 
 uint8_t PageFaultHandler::handlePageFault(uint8_t pageNumber, uint8_t offset){

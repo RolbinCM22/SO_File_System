@@ -6,7 +6,7 @@
 #include <iomanip>
 #include <stdexcept>
 
-#include "VirtualMemoryUnit.h" // for PAGE_SIZE, BACKING_PAGES
+#include "../VirtualMemoryUnit.h"
 
 /**
  * @brief Simulates secondary storage (backing store / swap file)

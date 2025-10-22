@@ -1,13 +1,11 @@
 #pragma once
-#include "PhysicalMemoryManager.h"
-#include "BackingStoreManager.h"
-
+#include "../physical/PhysicalMemoryManager.h"
+#include "../physical/BackingStoreManager.h"
 
 class PageFaultHandler {
     private:
     PhysicalMemoryManager physicalMemory;
     BackingStoreManager backingStore;
-    
 
 public:
     /**

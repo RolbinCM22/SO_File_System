@@ -1,4 +1,8 @@
+
 #include "PhysicalMemoryManager.h"
+
+#include <cstring>
+
 PhysicalMemoryManager::PhysicalMemoryManager() {
     // Initialize physical memory and frame usage
     for (auto& frame : physicalMemory) {
@@ -39,6 +43,27 @@ void PhysicalMemoryManager::write_byte(size_t frameIndex, size_t offset, char va
     }
     physicalMemory[frameIndex][offset] = value;
 }
+
+void PhysicalMemoryManager::read_frame(const size_t frameIndex, char* outBuffer, const size_t size) const {
+  if (frameIndex >= NUM_FRAMES) {
+    throw std::out_of_range("Frame index out of range");
+  }
+  if (size > PAGE_SIZE) {
+    throw std::out_of_range("Requested size exceeds page size");
+  }
+  std::memcpy(outBuffer, physicalMemory[frameIndex].data(), size);
+}
+
+void PhysicalMemoryManager::write_frame(const size_t frameIndex, const char* inBuffer,const size_t size) {
+  if (frameIndex >= NUM_FRAMES) {
+    throw std::out_of_range("Frame index out of range");
+  }
+  if (size > PAGE_SIZE) {
+    throw std::out_of_range("Data size exceeds page size");
+  }
+  std::memcpy(physicalMemory[frameIndex].data(), inBuffer, size);
+}
+
 std::optional<size_t> PhysicalMemoryManager::get_page_in_frame(size_t frameIndex) const {
     if (frameIndex >= NUM_FRAMES) {
         throw std::out_of_range("Frame index out of range");

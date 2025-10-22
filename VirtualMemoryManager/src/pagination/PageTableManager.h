@@ -2,7 +2,7 @@
 #include <vector>
 #include <cstdint>
 #include "PageFaultHandler.h"
-#include "PageTableEntry.h"
+#include "../structures/PageTableEntry.h"
 
 
 class PageTableManager {
@@ -65,6 +65,11 @@ class PageTableManager {
          * @param virtualPageNumber Virtual page number
          */
         void markReferenced(uint8_t pageNumber);
+
+        /**
+         * @brief Get the frame size used by this page table (bytes per frame)
+         */
+        int getFrameSize() const { return frameSize; }
 
 
 };

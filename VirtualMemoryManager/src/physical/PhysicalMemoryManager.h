@@ -2,14 +2,10 @@
 #define PHYSICALMEMORYMANAGER_H
 
 #include <array>
-#include <vector>
 #include <optional>
-#include <stdexcept>
 #include <iostream>
-#include <iomanip>
 
-#include "PageTableEntry.h"
-#include "VirtualMemoryUnit.h" // for PAGE_SIZE, NUM_FRAMES
+#include "../VirtualMemoryUnit.h"
 
 /**
  * @brief Manages physical memory frames allocation and replacement
@@ -28,11 +24,17 @@ private:
     /// Current frame index for FIFO replacement
     size_t nextFrameToReplace = 0;
 
-public:
-    /**
-     * @brief Construct a new Physical Memory Manager object
-     */
+  /**
+   * @brief Construct a new Physical Memory Manager object
+   */
     PhysicalMemoryManager();
+
+public:
+
+    static PhysicalMemoryManager& instance() {
+      static PhysicalMemoryManager instance;
+      return instance;
+    }
 
     /**
      * @brief Allocate a free frame, or choose one for replacement if full
@@ -61,6 +63,10 @@ public:
      * @param value Byte to write
      */
     void write_byte(size_t frameIndex, size_t offset, char value);
+
+    void read_frame(size_t frameIndex, char *outBuffer, size_t size) const;
+
+    void write_frame(size_t frameIndex, const char *inBuffer, size_t size);
 
     /**
      * @brief Get the virtual page number currently stored in a frame
