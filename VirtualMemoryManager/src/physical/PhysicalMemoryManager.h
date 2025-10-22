@@ -4,8 +4,7 @@
 #include <array>
 #include <optional>
 #include <iostream>
-
-#include "../VirtualMemoryUnit.h"
+#include "../constans.h"
 
 /**
  * @brief Manages physical memory frames allocation and replacement
@@ -31,6 +30,16 @@ private:
 
 public:
 
+    /**
+    * @brief Returns the singleton instance of the PhysicalMemoryManager.
+    *
+    * This method provides access to the single shared instance of the
+    * PhysicalMemoryManager class. It ensures that only one instance exists
+    * throughout the system by creating it the first time it is called
+    * and returning the same reference on subsequent calls.
+    *
+    * @return Reference to the singleton PhysicalMemoryManager instance.
+    */
     static PhysicalMemoryManager& instance() {
       static PhysicalMemoryManager instance;
       return instance;
