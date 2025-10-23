@@ -23,8 +23,9 @@ uint8_t extractOffset(uint32_t virtualAddress) {
     } else {
         uint8_t frame = this->faultHandler.handlePageFault(pageNumber, offset);
         setFrame(pageNumber, frame); 
-        std::cout << "PAGETABLEMANAGER: Direction no found" << std::endl;
+        std::cout << " PAGETABLEMANAGER: Direction no found" << std::endl;
         physicalDirection = (pageTable[pageNumber].frameNumber * this->frameSize) + offset;
+        std::cout << " PAGETABLEMANAGER: Direction found: " << physicalDirection << std::endl;
         return physicalDirection;
     }
 
@@ -44,5 +45,11 @@ uint8_t extractOffset(uint32_t virtualAddress) {
 
 void PageTableManager::markModified(uint8_t pageNumber){
     this->pageTable[pageNumber].dirtyBit = true;
+    this->dirtyPages[pageNumber] = true;
 }
+
+std::vector<bool> PageTableManager::getDirtyPages() const {
+    return dirtyPages;
+}
+
 

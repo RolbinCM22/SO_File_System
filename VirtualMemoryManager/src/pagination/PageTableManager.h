@@ -17,12 +17,16 @@ class PageTableManager {
          *
          */
         PageFaultHandler& faultHandler;
-        // /**
-        //  * @brief
-        //  * TODO: DOCUMENTAR
-        //  */
+        /**
+         * @brief Size of each frame in bytes
+         *
+         */
         int frameSize = 256;
-        void addToPageTable(uint8_t frame);
+        /**
+         * @brief Vector to track dirty pages
+         *
+         */
+        std::vector<bool> dirtyPages = std::vector<bool>(256, false);
     public:
         /**
          * @brief Construct a new Page Table Manager object
@@ -60,16 +64,20 @@ class PageTableManager {
          * @param virtualPageNumber Virtual page number
          */
         void markModified(uint8_t virtualPageNumber);
-        /**
-         * @brief Mark a page as referenced
-         * @param virtualPageNumber Virtual page number
-         */
-        void markReferenced(uint8_t pageNumber);
+   
+        //   /**
+        //    * @brief Mark a page as referenced
+        //    * @param virtualPageNumber Virtual page number
+        //    */
+        //  void markReferenced(uint8_t pageNumber);
 
         /**
          * @brief Get the frame size used by this page table (bytes per frame)
          */
         int getFrameSize() const { return frameSize; }
-
-
+        /**
+         * @brief Get the list of dirty pages
+         * @return std::vector<bool> Vector indicating which pages are dirty
+         */
+        std::vector<bool> getDirtyPages() const;
 };
