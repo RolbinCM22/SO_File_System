@@ -2,9 +2,8 @@
 
 #include "constans.h"
 
-VirtualMemoryUnit::VirtualMemoryUnit(
-  PageTableManager& ptm, PageFaultHandler& pfh, PhysicalMemoryManager& physmm)
-  : pageTableManager(ptm)
+VirtualMemoryUnit::VirtualMemoryUnit(PageFaultHandler& pfh, PhysicalMemoryManager& physmm)
+  : pageTableManager(PageTableManager(pfh))
   , pageFaultHandler(pfh)
   , physManager(physmm)
   , stats(MemoryStats()) {

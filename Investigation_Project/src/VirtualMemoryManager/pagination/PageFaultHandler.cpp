@@ -6,9 +6,9 @@
 
 #include "../constans.h"
 
-PageFaultHandler::PageFaultHandler()
-  : physicalMemory(PhysicalMemoryManager::instance())
-  , backingStore(BackingStoreManager::instance()) {
+PageFaultHandler::PageFaultHandler(PhysicalMemoryManager& mem, BackingStoreManager& bsm)
+  : physicalMemory(mem)
+  , backingStore(bsm) {
 
 }
 

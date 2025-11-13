@@ -1,7 +1,7 @@
 #include "PageTableManager.h"
 #include <vector>
 
-PageTableManager::PageTableManager() : faultHandler(PageFaultHandler::instance()) {
+PageTableManager::PageTableManager(PageFaultHandler& pfh) : faultHandler(pfh) {
 }
 
 PageTableManager::~PageTableManager()= default;

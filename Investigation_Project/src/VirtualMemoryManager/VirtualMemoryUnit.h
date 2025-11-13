@@ -13,7 +13,7 @@
  */
 class VirtualMemoryUnit {
 private:
-    PageTableManager& pageTableManager;
+    PageTableManager pageTableManager;
     PageFaultHandler& pageFaultHandler;
     PhysicalMemoryManager& physManager;
     MemoryStats stats;
@@ -23,7 +23,6 @@ public:
      * @brief Construct a new MMU object
      */
     explicit VirtualMemoryUnit(
-      PageTableManager& ptm,
       PageFaultHandler& pfh,
       PhysicalMemoryManager& physmm
     );
@@ -82,6 +81,11 @@ private:
    * @param value Byte value to write
    */
   void write_to_frame(size_t frame_idx, size_t offset, char value) const;
+
+  /**
+   * @brief Returns a reference to the internal page table (for debugging).
+   */
+    PageTableManager& getPageTable() { return pageTableManager; }
 };
 
 #endif //VIRTUALMEMORYMANAGER_VIRTUALMEMORYUNIT_H

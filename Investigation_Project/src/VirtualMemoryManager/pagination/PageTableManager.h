@@ -32,7 +32,7 @@ class PageTableManager {
          * @brief Construct a new Page Table Manager object
          * 
          */
-        PageTableManager();
+        PageTableManager(PageFaultHandler& faultHandler);
         /**
          * @brief Destroy the Page Table Manager object
          * 

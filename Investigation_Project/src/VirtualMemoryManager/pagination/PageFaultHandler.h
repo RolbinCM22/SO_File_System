@@ -12,26 +12,11 @@ class PageFaultHandler {
 
 public:
 
-   /**
-   * @brief Returns the singleton instance of the PageFaultHandler.
-   *
-   * This method provides access to the single shared instance of the
-   * PageFaultHandler class. It ensures that only one instance exists
-   * throughout the system by creating it the first time it is called
-   * and returning the same reference on subsequent calls.
-   *
-   * @return Reference to the singleton PageFaultHandler instance.
-   */
-    static PageFaultHandler& instance() {
-      static PageFaultHandler instance;
-      return instance;
-    }
-
     /**
      * @brief Construct a new Page Fault Handler object
      *
      */
-    PageFaultHandler();
+    PageFaultHandler(PhysicalMemoryManager& mem, BackingStoreManager& bsm);
 
     /**
      * @brief Destroy the Page Fault Handler object
