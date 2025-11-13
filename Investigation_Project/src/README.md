@@ -15,8 +15,11 @@ Kernel básico que muestra un gato ASCII en pantalla usando modo protegido de 32
 sudo apt update
 sudo apt install build-essential nasm qemu-system-x86 gcc-multilib
 ```
-
-## Compilación y Ejecución
+#### Fedora/CentOS/RHEL
+```bash
+sudo dnf update
+sudo dnf install gcc make nasm qemu-system-x86 glibc-devel.i686 glibc-static.i686
+```
 
 ### 1. Limpiar archivos previos
 ```bash
