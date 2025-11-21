@@ -7,6 +7,7 @@
 #include "Scheduler.h"
 #include "PCB.h"
 #include "VirtualMemoryManager/VirtualMemoryUnit.h"
+#include "ProgramLoader.h"
 
 
 /**
@@ -51,6 +52,7 @@ public:
 		// Saves the pcb on the process table
 		processTable[pcb->getProcessID()] = pcb;
 		scheduler.addProcess(pcb);
+		pcb->setProgram(ProgramLoader::buildDemoProgram());
 		std::cout << "[SysCall] Created process (PID=" << pcb->getProcessID() << ")\n";
 		return pcb;
 	}
