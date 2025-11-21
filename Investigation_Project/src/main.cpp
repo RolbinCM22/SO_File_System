@@ -3,6 +3,7 @@
 #include "PCB.h"
 #include "Scheduler.h"
 #include "SystemCalls.h"
+#include "CPU.h"
 
 /**
  * @brief Runs a full system-level test for the non-preemptive priority scheduler.
@@ -127,5 +128,21 @@ void runSystemTest() {
 
 int main() {
   runSystemTest();
+
+  Scheduler scheduler;
+  SystemCalls syscalls(scheduler);
+  CPU cpu(scheduler, syscalls);
+
+  // Crear varios procesos
+  for (int i = 0; i < 3; ++i) {
+    auto p = syscalls.createProcess();
+    p->setProgram(ProgramLoader::buildDemoProgram());
+  }
+
+  // CPU Loop
+  while (!scheduler.empty()) {
+    cpu.step();
+  }
+
   return 0;
 }
