@@ -6,11 +6,16 @@
 # Herramientas
 ASM     = nasm
 CC      = gcc
+CXX     = g++
 LD      = ld
 OBJCOPY = objcopy
 QEMU    = qemu-system-i386
 
-# Archivos
+# ============================================
+#           COMPILACIÓN DEL KERNEL
+# ============================================
+
+# Archivos del kernel bare-metal
 BOOT_BIN   = boot.bin
 KERNEL_BIN = kernel.bin
 KERNEL_OBJ = kernel.o
@@ -24,13 +29,41 @@ SRC_BOOT   = boot.asm
 KERNEL_SECTORS = 16
 DISK_SIZE      = 4096      # sectores (2MB aprox)
 
-# Opciones del compilador y linker
+# Opciones del compilador y linker del kernel
 CFLAGS  = -m32 -ffreestanding -c
 LDFLAGS = -m elf_i386 -T $(LINKER) -nostdlib
 
 # ============================================
+#     COMPILACIÓN DEL SISTEMA EN C++ (SO)
+# ============================================
 
-all: $(DISK_IMG)
+# Buscar todos los .cpp dentro de VirtualMemoryManager y CPU, etc.
+CPP_SOURCES := $(shell find VirtualMemoryManager -name "*.cpp") \
+               $(shell find . -maxdepth 1 -name "*.cpp")
+
+CPP_OBJECTS := $(CPP_SOURCES:.cpp=.o)
+
+SO_EXE = SO_File_System
+
+CXXFLAGS = -std=c++20 -Wall -Wextra -O2 \
+           -IVirtualMemoryManager \
+           -IVirtualMemoryManager/pagination \
+           -IVirtualMemoryManager/physical \
+           -IVirtualMemoryManager/structures
+
+$(SO_EXE): $(CPP_OBJECTS)
+	@echo "[CXX] Enlazando sistema operativo simulado (SO_File_System)..."
+	$(CXX) $(CPP_OBJECTS) -o $(SO_EXE)
+
+%.o: %.cpp
+	@echo "[CXX] Compilando $< ..."
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+# ============================================
+#              COMPILACIÓN KERNEL
+# ============================================
+
+all: $(DISK_IMG) $(SO_EXE)
 
 $(BOOT_BIN): $(SRC_BOOT)
 	@echo "[ASM] Ensamblando bootloader..."
@@ -55,14 +88,25 @@ $(DISK_IMG): $(BOOT_BIN) $(KERNEL_BIN)
 	dd if=$(KERNEL_BIN) of=$(DISK_IMG) bs=512 seek=1 conv=notrunc status=none
 	@echo "[OK] Imagen creada: $(DISK_IMG)"
 
+# ============================================|
+#                   EJECUCIÓN
 # ============================================
 
-run: all
+run: $(DISK_IMG)
 	@echo "[QEMU] Ejecutando sistema operativo..."
 	$(QEMU) -drive format=raw,file=$(DISK_IMG) -boot c -no-reboot -no-shutdown
 
+run-so:
+	@echo "[SO] Ejecutando sistema operativo simulado..."
+	./$(SO_EXE)
+
+# ============================================
+#                   CLEAN
+# ============================================
+
 clean:
 	rm -f $(BOOT_BIN) $(KERNEL_BIN) $(KERNEL_ELF) $(KERNEL_OBJ) $(DISK_IMG)
+	rm -f $(CPP_OBJECTS) $(SO_EXE)
 	@echo "[CLEAN] Archivos eliminados."
 
 # ============================================
