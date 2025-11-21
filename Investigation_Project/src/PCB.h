@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <memory>
 #include "VirtualMemoryManager/VirtualMemoryUnit.h"
+#include "Instruction.h"
 
 /**
  * @class PCB
@@ -52,6 +53,7 @@ class PCB {
   Registers registers;         ///< Saved CPU registers.
   Priority priority;           ///< Scheduling priority.
   std::unique_ptr<VirtualMemoryUnit> vmu; ///< Associated virtual memory unit.
+	std::vector<Instruction> program;
 
 	public:
 	  PCB(uint64_t pid,
@@ -70,11 +72,13 @@ class PCB {
     [[nodiscard]] State getState() const { return this->state; }
 		[[nodiscard]] Priority getPriority() const { return this->priority; }
     [[nodiscard]] uint64_t getProgramCounter() const { return this->programCounter; }
+		[[nodiscard]] std::vector<Instruction> getProgram() const { return this->program; }
 
     // Setters
 		void setState(State st) { this->state = st; }
 		void setProgramCounter(uint64_t pc) { this->programCounter = pc; }
 		void setPriority(Priority prio) { this->priority = prio; }
+		void setProgram(std::vector<Instruction> v) { this->program = v; }
 
     // Memory access via VMU (delegación)
     char readMemory(size_t vpn, size_t offset) { return this->vmu->read_memory(vpn, offset); }
