@@ -40,3 +40,57 @@ int proc_exit(int pid){
     }
     return -1; 
 }
+
+int proc_wait(int waiter_pid, int target_pid){
+    pcb_t* waiter = proc_get(waiter_pid);
+    pcb_t* target = proc_get(target_pid);
+    if (!waiter || !target) return -1;
+    if (target->state == PS_TERMINATED) return 0; 
+    waiter->state = PS_WAITING;
+    waiter->waiting_for = target_pid;
+    return 0;
+}
+
+int proc_set_priority(int pid, int priority){
+    pcb_t* proc = proc_get(pid);
+    if (!proc) return -1;
+    proc->priority = priority;
+    return 0;
+}
+
+int proc_msg_send(int dest_pid, const char* buffer){
+    for(int i=0;i<MAX_PROCS;i++){
+        if(procs[i].state!=PS_EMPTY && procs[i].pid==dest_pid){
+            strncpy(procs[i].msg, buffer ? buffer : "", MSG_SIZE-1);
+            procs[i].msg[MSG_SIZE-1]=0;
+            procs[i].has_msg = 1;
+            return 0;
+        }
+    }
+    return -1;
+}
+
+pcb_t* proc_get(int pid){
+    for(int i=0;i<MAX_PROCS;i++){
+        if(procs[i].state!=PS_EMPTY && procs[i].pid==pid){
+            return &procs[i];
+        }
+    }
+    return NULL;
+}
+
+void proc_list_debug(void){
+    printf("PID\tProgID\tPrio\tState\tHasMsg\tWaitingFor\n");
+    for(int i=0;i<MAX_PROCS;i++){
+        if(procs[i].state!=PS_EMPTY){
+            printf("%d\t%d\t%d\t%d\t%d\t%d\n",
+                procs[i].pid,
+                procs[i].program_id,
+                procs[i].priority,
+                procs[i].state,
+                procs[i].has_msg,
+                procs[i].waiting_for
+            );
+        }
+    }
+}
