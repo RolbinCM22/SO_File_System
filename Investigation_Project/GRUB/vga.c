@@ -94,3 +94,28 @@ int printf(const char* fmt, ...){
     va_end(ap);
     return 0;
 }
+
+void console_set_cursor(int row, int col) {
+    if (row < 0) row = 0;
+    if (col < 0) col = 0;
+    if (row >= VGA_H) row = VGA_H - 1;
+    if (col >= VGA_W) col = VGA_W - 1;
+
+    cur_row = row;
+    cur_col = col;
+    vga_set_hw_cursor(row, col);
+}
+
+static inline void outb(uint16_t port, uint8_t val) {
+    __asm__ volatile ("outb %0, %1" : : "a"(val), "Nd"(port));
+}
+
+void vga_set_hw_cursor(int row, int col) {
+    uint16_t pos = (uint16_t)(row * 80 + col);
+
+    outb(0x3D4, 0x0F);
+    outb(0x3D5, (uint8_t)(pos & 0xFF));
+    outb(0x3D4, 0x0E);
+    outb(0x3D5, (uint8_t)((pos >> 8) & 0xFF));
+}
+

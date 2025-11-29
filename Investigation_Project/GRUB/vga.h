@@ -29,3 +29,12 @@ void console_write(const char* s);
  * @param s 
  */
 void console_writeln(const char* s);
+/**
+ * @brief Set the cursor position on the console
+ * 
+ * @param row 
+ * @param col 
+ */
+void console_set_cursor(int row, int col);
+
+void vga_set_hw_cursor(int row, int col);
