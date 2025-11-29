@@ -1,9 +1,8 @@
-#pragma once
+#ifndef SYSCALL_H
+#define SYSCALL_H
+
 #include <stdint.h>
-/**
- * @brief System call numbers
- * 
- */
+
 enum {
     SYS_CREATE_PROCESS = 1,
     SYS_EXIT_PROCESS   = 2,
@@ -11,12 +10,19 @@ enum {
     SYS_SET_PRIORITY   = 4,
     SYS_MESSAGE_SEND   = 5,
 
-    // (e) nuevas 5 syscalls
-    SYS_LOGIN          = 6,  // (char* user, char* pass)
-    SYS_LOGOUT         = 7,  // ()
-    SYS_WHOAMI         = 8,  // ()
-    SYS_USER_ADD       = 9,  // (char* user, char* pass, role)
-    SYS_PROC_KILL      = 10  // (pid)
+    SYS_LOGIN          = 6,
+    SYS_LOGOUT         = 7,
+    SYS_WHOAMI         = 8,
+    SYS_USER_ADD       = 9,
+    SYS_PROC_KILL      = 10,
+
+    SYS_VMM_READ       = 11,
+    SYS_VMM_WRITE      = 12,
+    SYS_VMM_FRAMES     = 13,
+    SYS_PROC_LIST      = 14
 };
 
 uint32_t isr80_c(uint32_t *regs);
+
+#endif
+

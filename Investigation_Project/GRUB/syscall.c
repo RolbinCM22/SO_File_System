@@ -2,6 +2,12 @@
 #include "process.h"
 #include "user.h"
 #include <stdint.h>
+#include "../src/VMM_C/virtual_memory_unit.h"
+#include "../src/VMM_C/physical_memory_manager.h"
+
+extern virtual_memory_unit_t g_vmu;
+extern physical_memory_manager_t g_pmm;
+
 /**
  * @brief Handle system calls
  * 
@@ -61,10 +67,30 @@ uint32_t isr80_c(uint32_t *regs){
             regs[0] = (uint32_t) user_add((const char*)a, (const char*)b, (role_t)c);
             break;
         }
-
-        default:
+        case SYS_VMM_READ: {
+            // a=vpn, b=offset, c=ptr a char donde escribir el valor
+            char* out = (char*)c;
+            regs[0] = (uint32_t) vmu_read_memory(&g_vmu, (size_t)a, (size_t)b, out);
+            break;
+        }
+        case SYS_VMM_WRITE: {
+            // a=vpn, b=offset, c=value (0..255)
+            regs[0] = (uint32_t) vmu_write_memory(&g_vmu, (size_t)a, (size_t)b, (char)(c & 0xFF));
+            break;
+        }
+        case SYS_VMM_FRAMES: {
+            pmm_print_frame_table(&g_pmm);
+            regs[0] = 0;
+            break;
+        }
+        case SYS_PROC_LIST: {
+            proc_list_debug();
+            regs[0] = 0;
+            break;
+        }
+            default:
             regs[0] = (uint32_t)-1;
             break;
-    }
+        }
     return regs[0];
 }

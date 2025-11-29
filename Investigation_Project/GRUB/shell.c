@@ -1,10 +1,19 @@
 #include "shell.h"
 #include "vga.h"
 #include "kbd.h"
-#include "syscall.h"
+#include "syscalls_user.h"
 #include "process.h"
 #include <stdint.h>
 #include <string.h>
+#include "syscalls_user.h"
+#include "../src/VMM_C/virtual_memory_unit.h"
+#include "../src/VMM_C/physical_memory_manager.h"
+
+// vienen de kernel.c
+extern virtual_memory_unit_t g_vmu;
+extern physical_memory_manager_t g_pmm;
+
+
 /**
  * @brief Convert a string to an integer
  * 
@@ -137,6 +146,48 @@ static void run_cmd(int argc, char* argv[]){
         regs[1] = (uint32_t)name;         // arg2 (args/name)
         int pid = (int)isr80_c(regs);
         printf("pid=%d\n", pid);
+        return;
+    }
+    if(strcmp(argv[0], "vread") == 0){
+        if(argc < 3){
+            console_writeln("uso: vread <vpn> <off>");
+            return;
+        }
+
+        int vpn = katoi(argv[1]);
+        int off = katoi(argv[2]);
+
+        char value = 0;
+        int st = vmu_read_memory(&g_vmu, (size_t)vpn, (size_t)off, &value);
+
+        if(st == 0){
+            printf("vread vpn=%d off=%d -> %d (0x%x)\n", vpn, off, (int)(unsigned char)value, (unsigned char)value);
+        } else {
+            printf("vread error=%d (vpn/off fuera de rango)\n", st);
+        }
+        return;
+    }
+    if(strcmp(argv[0], "vwrite") == 0){
+        if(argc < 4){
+            console_writeln("uso: vwrite <vpn> <off> <val>");
+            return;
+        }
+
+        int vpn = katoi(argv[1]);
+        int off = katoi(argv[2]);
+        int val = katoi(argv[3]);          // 0..255 recomendado
+
+        int st = vmu_write_memory(&g_vmu, (size_t)vpn, (size_t)off, (char)val);
+
+        if(st == 0){
+            printf("vwrite ok vpn=%d off=%d val=%d\n", vpn, off, val);
+        } else {
+            printf("vwrite error=%d\n", st);
+        }
+        return;
+    }
+    if(strcmp(argv[0], "vframes") == 0){
+        pmm_print_frame_table(&g_pmm);
         return;
     }
 
