@@ -19,7 +19,6 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c | $(BUILD_DIR)
 
 $(TARGET): $(OBJS) | $(BIN_DIR)
 	$(CC) $(CFLAGS) -o $@ $(OBJS)
-	@echo "✓ Compilación exitosa: $(TARGET)"
 
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
@@ -35,7 +34,6 @@ run: all
 
 clean:
 	rm -rf $(BUILD_DIR) $(BIN_DIR)
-	@echo "✓ Archivos limpios"
 
 help:
 	@echo "Comandos disponibles:"
