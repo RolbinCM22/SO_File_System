@@ -1,27 +1,41 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -std=c99
-TARGET = ipc_msgqueue
-SRC = ipc_msgqueue.c
-OBJ = $(SRC:.c=.o)
+
+SRC_DIR := src
+BUILD_DIR := build
+BIN_DIR := bin
+
+SRCS := $(wildcard $(SRC_DIR)/*.c)
+OBJS := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(SRCS))
+
+TARGET := $(BIN_DIR)/ipc_msgqueue
 
 .PHONY: all run clean help
 
 all: $(TARGET)
 
-$(TARGET): $(OBJ)
-	$(CC) $(CFLAGS) -o $(TARGET) $(OBJ)
-
-%.o: %.c
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.c | $(BUILD_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-run: $(TARGET)
-	@echo "═══════════════════════════════════════════════════════════"
+$(TARGET): $(OBJS) | $(BIN_DIR)
+	$(CC) $(CFLAGS) -o $@ $(OBJS)
+	@echo "✓ Compilación exitosa: $(TARGET)"
+
+$(BUILD_DIR):
+	mkdir -p $(BUILD_DIR)
+
+$(BIN_DIR):
+	mkdir -p $(BIN_DIR)
+
+run: all
+	@echo "══════════════════════════════════════════════════════════="
 	@echo "Ejecutando demostración de IPC con System V Message Queues"
-	@echo "═══════════════════════════════════════════════════════════"
-	./$(TARGET)
+	@echo "══════════════════════════════════════════════════════════="
+	$(TARGET)
 
 clean:
-	rm -f $(OBJ) $(TARGET)
+	rm -rf $(BUILD_DIR) $(BIN_DIR)
+	@echo "✓ Archivos limpios"
 
 help:
 	@echo "Comandos disponibles:"
