@@ -34,9 +34,9 @@ void kernel_main() {
     puts_at(2, 30, "Bienvenido al MichiKernel", 0x1E);
     puts_at(3, 35, "Instrucciones", 0x2F);
     puts_at(5, 10, "Comandos: whoami | login u p | logout | useradd u p role | ps | kill pid | prio pid n", 0x0A);
-    // Globals: g_bsm, g_pmm, g_pfh, g_ptm, g_vmu
+   
     bsm_init(&g_bsm);
-    bsm_init_test_patterns(&g_bsm);   // opcional pero útil para pruebas
+   // bsm_init_test_patterns(&g_bsm);   
 
     pmm_init(&g_pmm);
 
