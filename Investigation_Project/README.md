@@ -60,4 +60,39 @@ Opción 5: imprime mensaje de salida y detiene la CPU con hlt. Cada opción regr
 
 Termina igual que el anterior, llenando con ceros hasta 510 bytes y finaliza con 0xAA55 para garantizar que sea reconocido como boot sector.
 
+## Ejecución (GRUB)
+
+1. Instala dependencias:
+   ```bash
+   # Ubuntu/Debian
+   sudo apt update
+   sudo apt install build-essential nasm grub2-common qemu-system-i386 gcc-multilib
+
+   # Fedora
+   sudo dnf install gcc make nasm grub2-tools qemu-system-x86 glibc-devel.i686
+   ```
+
+2. Compila:
+   ```bash
+   cd Investigation_Project/GRUB
+   make clean
+   make
+   ```
+
+3. Verifica encabezado Multiboot (opcional):
+   ```bash
+   grub-file --is-x86-multiboot kernel.elf && echo "OK"
+   ```
+
+4. Ejecuta en QEMU:
+   ```bash
+   make run
+   # o
+   qemu-system-i386 -kernel kernel.elf -serial stdio
+   ```
+
+5. Cierra QEMU con `Ctrl+Alt+Q` o `Ctrl+C` en la terminal.
+
+
+
 
