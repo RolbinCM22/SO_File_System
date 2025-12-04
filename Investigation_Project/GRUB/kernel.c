@@ -33,7 +33,19 @@ void kernel_main() {
 
     puts_at(2, 30, "Bienvenido al MichiKernel", 0x1E);
     puts_at(3, 35, "Instrucciones", 0x2F);
-    puts_at(5, 10, "Comandos: whoami | login u p | logout | useradd u p role | ps | kill pid | prio pid n", 0x0A);
+    puts_at(5, 10, "Comandos basicos:", 0x0A);
+    puts_at(6, 12, "- whoami: muestra usuario actual", 0x07);
+    puts_at(7, 12, "- login <user> <pass>: inicia sesion", 0x07);
+    puts_at(8, 12, "- logout: cierra sesion", 0x07);
+    puts_at(9, 12, "- useradd <u> <p> <rol>: crea usuario", 0x07);
+    puts_at(10, 12, "- ps: lista procesos (PID, estado)", 0x07);
+    puts_at(11, 12, "- kill <pid>: termina proceso", 0x07);
+    puts_at(12, 12, "- prio <pid> <n>: cambia prioridad", 0x07);
+    puts_at(13, 12, "- help: vuelve a mostrar esta lista", 0x07);
+    puts_at(15, 10, "Memoria virtual:", 0x0A);
+    puts_at(16, 12, "- vread <vpn> <off>", 0x07);
+    puts_at(17, 12, "- vwrite <vpn> <off> <val>", 0x07);
+    puts_at(18, 12, "- vframes", 0x07);
    
     bsm_init(&g_bsm);
    // bsm_init_test_patterns(&g_bsm);   
@@ -45,8 +57,8 @@ void kernel_main() {
 
     vmu_init(&g_vmu, &g_pmm, &g_bsm);
     console_putc('\n');
-    console_writeln("Shell listo. Proba: whoami");
-    console_set_cursor(10, 0);
+    console_writeln("[KERNEL] Virtual Memory Unit initialized.");
+    console_set_cursor(19, 0);
     shell_run();   // <- aquí el control NO vuelve
     while(1);
 }
